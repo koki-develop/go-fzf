@@ -2,10 +2,13 @@ package fzf
 
 import (
 	"fmt"
+	"strings"
+	"unicode/utf8"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
 
 var (
@@ -72,7 +75,26 @@ func (m *model) headerView() string {
 }
 
 func (m *model) itemsView() string {
-	return fmt.Sprintf("cursor: %d\n%s", m.cursor, m.items)
+	var v strings.Builder
+
+	for i := 0; i < m.items.Len(); i++ {
+		// write cursor
+		cursor := strings.Repeat(" ", utf8.RuneCountInString(m.fzf.option.cursor))
+		if m.cursor == i {
+			cursor = m.fzf.option.cursor
+		}
+		_, _ = v.WriteString(cursor)
+
+		// write item
+		_, _ = v.WriteString(m.items.ItemString(i))
+
+		if i+1 == m.windowYPosition+(m.windowHeight-(lipgloss.Height(m.headerView()))) {
+			break
+		}
+		v.WriteString("\n")
+	}
+
+	return v.String()
 }
 
 /*
@@ -129,7 +151,7 @@ func (m *model) cursorUp() {
 }
 
 func (m *model) cursorDown() {
-	if m.cursor < m.items.Len() {
+	if m.cursor+1 < m.items.Len() {
 		m.cursor++
 	}
 }

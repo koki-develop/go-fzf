@@ -92,7 +92,17 @@ func (m *model) itemsView() string {
 		_, _ = v.WriteString(cursor)
 
 		// write item
-		_, _ = v.WriteString(m.items.ItemString(i))
+		itemstring := m.items.ItemString(i)
+		var itemv strings.Builder
+		for _, c := range itemstring {
+			// cursor line
+			if i == m.cursor {
+				_, _ = itemv.WriteString(m.fzf.option.styles.CursorLine.Render(string(c)))
+			} else {
+				itemv.WriteString(string(c))
+			}
+		}
+		_, _ = v.WriteString(itemv.String())
 
 		if i+1 == m.windowYPosition+(m.windowHeight-(headerHeight)) {
 			break

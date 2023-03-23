@@ -25,5 +25,9 @@ func (fzf *FZF) Find(items Items) (int, error) {
 		return 0, err
 	}
 
+	if m.abort {
+		return 0, ErrAbort
+	}
+
 	return 0, nil
 }

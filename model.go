@@ -15,7 +15,7 @@ type model struct {
 	items Items
 
 	// state
-	aborted bool
+	abort bool
 
 	// components
 	input textinput.Model
@@ -48,7 +48,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.fzf.option.keymap.Abort):
-			m.aborted = true
+			m.abort = true
 			return m, tea.Quit
 		case key.Matches(msg, m.fzf.option.keymap.Choose):
 			return m, tea.Quit

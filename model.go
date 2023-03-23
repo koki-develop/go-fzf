@@ -17,8 +17,9 @@ type model struct {
 	items Items
 
 	// state
-	abort  bool
-	cursor int
+	abort   bool
+	cursor  int
+	choices []int
 
 	// components
 	input textinput.Model
@@ -33,6 +34,10 @@ func newModel(fzf *FZF, items Items) *model {
 	return &model{
 		fzf:   fzf,
 		items: items,
+		// state
+		abort:   false,
+		cursor:  0,
+		choices: []int{},
 		// components
 		input: input,
 	}
@@ -75,6 +80,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case key.Matches(msg, m.fzf.option.keymap.Choose):
 			// choose
+			m.choice()
 			return m, tea.Quit
 		case key.Matches(msg, m.fzf.option.keymap.Up):
 			// up
@@ -93,6 +99,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, tea.Batch(cmds...)
+}
+
+func (m *model) choice() {
+	if len(m.choices) == 0 && m.cursor >= 0 {
+		m.choices = append(m.choices, m.cursor)
+	}
 }
 
 func (m *model) cursorUp() {

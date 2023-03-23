@@ -2,18 +2,13 @@ package fzf
 
 import (
 	"github.com/charmbracelet/bubbles/key"
-	"github.com/charmbracelet/lipgloss"
 )
 
 var defaultOption = option{
 	prompt:           "> ",
 	cursor:           "> ",
 	inputPlaceholder: "Filter...",
-	styles: &styles{
-		Cursor:     lipgloss.NewStyle(),
-		CursorLine: lipgloss.NewStyle(),
-		Matches:    lipgloss.NewStyle(),
-	},
+	styles:           NewStyles(),
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
 		Down:   key.NewBinding(key.WithKeys("down", "ctrl+n")),
@@ -26,7 +21,7 @@ var defaultOption = option{
 type option struct {
 	prompt           string
 	cursor           string
-	styles           *styles
+	styles           *Styles
 	inputPlaceholder string
 	keymap           *keymap
 }
@@ -45,17 +40,9 @@ func WithCursor(c string) Option {
 	}
 }
 
-func WithStyles(ss *Styles) Option {
+func WithStyles(opts ...StylesOption) Option {
 	return func(o *option) {
-		if ss.Cursor != nil {
-			o.styles.Cursor = ss.Cursor.lipgloss()
-		}
-		if ss.CursorLine != nil {
-			o.styles.CursorLine = ss.CursorLine.lipgloss()
-		}
-		if ss.Matches != nil {
-			o.styles.Matches = ss.Matches.lipgloss()
-		}
+		o.styles = NewStyles(opts...)
 	}
 }
 

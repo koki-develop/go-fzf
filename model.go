@@ -90,7 +90,7 @@ func (m *model) itemsView() string {
 		// write cursor
 		cursor := strings.Repeat(" ", cursorLen)
 		if m.cursor == i {
-			cursor = m.fzf.option.styles.Cursor.Render(m.fzf.option.cursor)
+			cursor = m.fzf.option.styles.option.cursor.Render(m.fzf.option.cursor)
 		}
 		_, _ = v.WriteString(cursor)
 
@@ -100,10 +100,10 @@ func (m *model) itemsView() string {
 			// matches
 			style := lipgloss.NewStyle()
 			if intContains(match.MatchedIndexes, ci) {
-				style = style.Inherit(m.fzf.option.styles.Matches)
+				style = style.Inherit(m.fzf.option.styles.option.matches)
 			}
 			if i == m.cursor {
-				style = style.Inherit(m.fzf.option.styles.CursorLine)
+				style = style.Inherit(m.fzf.option.styles.option.cursorLine)
 			}
 			_, _ = itemv.WriteString(style.Render(string(c)))
 		}

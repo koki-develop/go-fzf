@@ -9,11 +9,15 @@ import (
 	"github.com/spf13/cobra"
 )
 
-type items []string
+const (
+	mainColor = "#00ADD8"
+)
 
 var (
 	_ fzf.Items = (items)(nil)
 )
+
+type items []string
 
 func (is items) ItemString(i int) string {
 	return is[i]
@@ -34,7 +38,11 @@ var rootCmd = &cobra.Command{
 			is = append(is, sc.Text())
 		}
 
-		f := fzf.New()
+		f := fzf.New(fzf.WithStyles(
+			fzf.WithStyleCursor(fzf.Style{ForegroundColor: mainColor}),
+			fzf.WithStyleCursorLine(fzf.Style{Bold: true}),
+			fzf.WithStyleMatches(fzf.Style{ForegroundColor: mainColor}),
+		))
 		i, err := f.Find(is)
 		if err != nil {
 			return err

@@ -4,6 +4,7 @@ import "github.com/charmbracelet/bubbles/key"
 
 var defaultOption = option{
 	prompt:           "> ",
+	cursor:           "> ",
 	inputPlaceholder: "Filter...",
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
@@ -16,6 +17,7 @@ var defaultOption = option{
 
 type option struct {
 	prompt           string
+	cursor           string
 	inputPlaceholder string
 	keymap           *keymap
 }
@@ -25,6 +27,12 @@ type Option func(o *option)
 func WithPrompt(p string) Option {
 	return func(o *option) {
 		o.prompt = p
+	}
+}
+
+func WithCursor(c string) Option {
+	return func(o *option) {
+		o.cursor = c
 	}
 }
 

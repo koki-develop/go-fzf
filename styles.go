@@ -9,11 +9,14 @@ type Style struct {
 }
 
 type Styles struct {
-	Matches    *Style
 	CursorLine *Style
 }
 
-func (s *Style) style() lipgloss.Style {
+type styles struct {
+	CursorLine lipgloss.Style
+}
+
+func (s *Style) lipgloss() lipgloss.Style {
 	style := lipgloss.NewStyle()
 
 	if s.ForegroundColor != "" {

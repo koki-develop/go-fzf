@@ -9,6 +9,9 @@ var defaultOption = option{
 	prompt:           "> ",
 	cursor:           lipgloss.NewStyle().Foreground(lipgloss.Color("#00ADD8")).Render("> "),
 	inputPlaceholder: "Filter...",
+	styles: &styles{
+		CursorLine: lipgloss.NewStyle().Bold(true),
+	},
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
 		Down:   key.NewBinding(key.WithKeys("down", "ctrl+n")),
@@ -21,6 +24,7 @@ var defaultOption = option{
 type option struct {
 	prompt           string
 	cursor           string
+	styles           *styles
 	inputPlaceholder string
 	keymap           *keymap
 }
@@ -36,6 +40,14 @@ func WithPrompt(p string) Option {
 func WithCursor(c string) Option {
 	return func(o *option) {
 		o.cursor = c
+	}
+}
+
+func WithStyles(ss *Styles) Option {
+	return func(o *option) {
+		if ss.CursorLine != nil {
+			o.styles.CursorLine = ss.CursorLine.lipgloss()
+		}
 	}
 }
 

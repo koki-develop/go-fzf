@@ -21,6 +21,11 @@ type model struct {
 	cursor  int
 	choices []int
 
+	// window
+	windowWidth     int
+	windowHeight    int
+	windowYPosition int
+
 	// components
 	input textinput.Model
 }
@@ -38,6 +43,10 @@ func newModel(fzf *FZF, items Items) *model {
 		abort:   false,
 		cursor:  0,
 		choices: []int{},
+		// window
+		windowWidth:     0,
+		windowHeight:    0,
+		windowYPosition: 0,
 		// components
 		input: input,
 	}
@@ -73,6 +82,7 @@ func (m *model) itemsView() string {
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		// key
 		switch {
 		case key.Matches(msg, m.fzf.option.keymap.Abort):
 			// abort
@@ -89,6 +99,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// down
 			m.cursorDown()
 		}
+	case tea.WindowSizeMsg:
+		// window
+		m.windowWidth = msg.Width
+		m.windowHeight = msg.Height
+		m.input.Width = m.windowWidth - 3
 	}
 
 	var cmds []tea.Cmd

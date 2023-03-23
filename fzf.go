@@ -1,24 +1,29 @@
 package fzf
 
-import "fmt"
+import tea "github.com/charmbracelet/bubbletea"
 
 type FZF struct {
-	prompt string
+	option *option
 }
 
 func New(opts ...Option) *FZF {
 	o := defaultOption
-
 	for _, opt := range opts {
 		opt(&o)
 	}
 
 	return &FZF{
-		prompt: o.prompt,
+		option: &o,
 	}
 }
 
-func (fzf *FZF) Find() (int, error) {
-	fmt.Printf("%#v\n", fzf)
+func (fzf *FZF) Find(items Items) (int, error) {
+	m := newModel(fzf, items)
+
+	p := tea.NewProgram(m)
+	if _, err := p.Run(); err != nil {
+		return 0, err
+	}
+
 	return 0, nil
 }

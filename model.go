@@ -1,6 +1,8 @@
 package fzf
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -15,7 +17,8 @@ type model struct {
 	items Items
 
 	// state
-	abort bool
+	abort  bool
+	cursor int
 
 	// components
 	input textinput.Model
@@ -36,22 +39,49 @@ func newModel(fzf *FZF, items Items) *model {
 }
 
 func (m *model) Init() tea.Cmd {
-	return tea.EnterAltScreen
+	return tea.Batch(
+		textinput.Blink,
+		tea.EnterAltScreen,
+	)
 }
 
+/*
+ * view
+ */
+
 func (m *model) View() string {
+	return fmt.Sprintf("%s\n%s", m.headerView(), m.itemsView())
+}
+
+func (m *model) headerView() string {
 	return m.input.View()
 }
+
+func (m *model) itemsView() string {
+	return fmt.Sprintf("cursor: %d\n%s", m.cursor, m.items)
+}
+
+/*
+ * update
+ */
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		switch {
 		case key.Matches(msg, m.fzf.option.keymap.Abort):
+			// abort
 			m.abort = true
 			return m, tea.Quit
 		case key.Matches(msg, m.fzf.option.keymap.Choose):
+			// choose
 			return m, tea.Quit
+		case key.Matches(msg, m.fzf.option.keymap.Up):
+			// up
+			m.cursorUp()
+		case key.Matches(msg, m.fzf.option.keymap.Down):
+			// down
+			m.cursorDown()
 		}
 	}
 
@@ -63,4 +93,16 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	return m, tea.Batch(cmds...)
+}
+
+func (m *model) cursorUp() {
+	if m.cursor > 0 {
+		m.cursor--
+	}
+}
+
+func (m *model) cursorDown() {
+	if m.cursor < m.items.Len() {
+		m.cursor++
+	}
 }

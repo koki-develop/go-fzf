@@ -11,7 +11,7 @@ var defaultOption = option{
 	inputPlaceholder: "Filter...",
 	styles: &styles{
 		Cursor:     lipgloss.NewStyle(),
-		CursorLine: lipgloss.NewStyle().Bold(true),
+		CursorLine: lipgloss.NewStyle(),
 		Matches:    lipgloss.NewStyle(),
 	},
 	keymap: &keymap{

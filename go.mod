@@ -3,6 +3,7 @@ module github.com/koki-develop/go-fzf
 go 1.20
 
 require (
+	github.com/charmbracelet/bubbles v0.15.0
 	github.com/charmbracelet/bubbletea v0.23.2
 	github.com/spf13/cobra v1.6.1
 )

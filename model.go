@@ -77,7 +77,13 @@ func (m *model) headerView() string {
 func (m *model) itemsView() string {
 	var v strings.Builder
 
+	headerHeight := lipgloss.Height(m.headerView())
+
 	for i := 0; i < m.items.Len(); i++ {
+		if i < m.windowYPosition {
+			continue
+		}
+
 		// write cursor
 		cursor := strings.Repeat(" ", utf8.RuneCountInString(m.fzf.option.cursor))
 		if m.cursor == i {
@@ -88,7 +94,7 @@ func (m *model) itemsView() string {
 		// write item
 		_, _ = v.WriteString(m.items.ItemString(i))
 
-		if i+1 == m.windowYPosition+(m.windowHeight-(lipgloss.Height(m.headerView()))) {
+		if i+1 == m.windowYPosition+(m.windowHeight-(headerHeight)) {
 			break
 		}
 		v.WriteString("\n")
@@ -135,10 +141,18 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 
+	m.fixYPosition()
+	m.fixCursor()
+
 	return m, tea.Batch(cmds...)
 }
 
 func (m *model) choice() {
+	if m.items.Len() == 0 {
+		m.abort = true
+		return
+	}
+
 	if len(m.choices) == 0 && m.cursor >= 0 {
 		m.choices = append(m.choices, m.cursor)
 	}
@@ -153,5 +167,36 @@ func (m *model) cursorUp() {
 func (m *model) cursorDown() {
 	if m.cursor+1 < m.items.Len() {
 		m.cursor++
+	}
+}
+
+func (m *model) fixCursor() {
+	if m.cursor < 0 && m.items.Len() > 0 {
+		m.cursor = 0
+		return
+	}
+
+	if m.cursor+1 > m.items.Len() {
+		m.cursor = m.items.Len() - 1
+		return
+	}
+}
+
+func (m *model) fixYPosition() {
+	headerHeight := lipgloss.Height(m.headerView())
+
+	if m.windowHeight-headerHeight > m.items.Len() {
+		m.windowYPosition = 0
+		return
+	}
+
+	if m.cursor < m.windowYPosition {
+		m.windowYPosition = m.cursor
+		return
+	}
+
+	if m.cursor+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
+		m.windowYPosition = m.cursor + 1 - (m.windowHeight - headerHeight)
+		return
 	}
 }

@@ -3,7 +3,6 @@ package fzf
 import (
 	"fmt"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -78,6 +77,7 @@ func (m *model) itemsView() string {
 	var v strings.Builder
 
 	headerHeight := lipgloss.Height(m.headerView())
+	cursorLen := stringLen(m.fzf.option.cursor)
 
 	for i := 0; i < m.items.Len(); i++ {
 		if i < m.windowYPosition {
@@ -85,7 +85,7 @@ func (m *model) itemsView() string {
 		}
 
 		// write cursor
-		cursor := strings.Repeat(" ", utf8.RuneCountInString(m.fzf.option.cursor))
+		cursor := strings.Repeat(" ", cursorLen)
 		if m.cursor == i {
 			cursor = m.fzf.option.cursor
 		}

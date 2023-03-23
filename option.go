@@ -1,10 +1,13 @@
 package fzf
 
-import "github.com/charmbracelet/bubbles/key"
+import (
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/lipgloss"
+)
 
 var defaultOption = option{
 	prompt:           "> ",
-	cursor:           "> ",
+	cursor:           lipgloss.NewStyle().Foreground(lipgloss.Color("#00ADD8")).Render("> "),
 	inputPlaceholder: "Filter...",
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),

@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/sahilm/fuzzy"
 )
 
 var (
@@ -16,11 +17,12 @@ var (
 
 type model struct {
 	fzf   *FZF
-	items Items
+	items items
 
 	// state
 	abort   bool
 	cursor  int
+	matches fuzzy.Matches
 	choices []int
 
 	// window
@@ -32,7 +34,7 @@ type model struct {
 	input textinput.Model
 }
 
-func newModel(fzf *FZF, items Items) *model {
+func newModel(fzf *FZF, items items) *model {
 	input := textinput.New()
 	input.Prompt = fzf.option.prompt
 	input.Placeholder = fzf.option.inputPlaceholder
@@ -44,6 +46,7 @@ func newModel(fzf *FZF, items Items) *model {
 		// state
 		abort:   false,
 		cursor:  0,
+		matches: fuzzy.Matches{},
 		choices: []int{},
 		// window
 		windowWidth:     0,
@@ -79,7 +82,7 @@ func (m *model) itemsView() string {
 	headerHeight := lipgloss.Height(m.headerView())
 	cursorLen := stringLen(m.fzf.option.cursor)
 
-	for i := 0; i < m.items.Len(); i++ {
+	for i, match := range m.matches {
 		if i < m.windowYPosition {
 			continue
 		}
@@ -92,15 +95,17 @@ func (m *model) itemsView() string {
 		_, _ = v.WriteString(cursor)
 
 		// write item
-		itemstring := m.items.ItemString(i)
 		var itemv strings.Builder
-		for _, c := range itemstring {
-			// cursor line
-			if i == m.cursor {
-				_, _ = itemv.WriteString(m.fzf.option.styles.CursorLine.Render(string(c)))
-			} else {
-				itemv.WriteString(string(c))
+		for ci, c := range match.Str {
+			// matches
+			style := lipgloss.NewStyle()
+			if intContains(match.MatchedIndexes, ci) {
+				style = style.Inherit(m.fzf.option.styles.Matches)
 			}
+			if i == m.cursor {
+				style = style.Inherit(m.fzf.option.styles.CursorLine)
+			}
+			_, _ = itemv.WriteString(style.Render(string(c)))
 		}
 		_, _ = v.WriteString(itemv.String())
 
@@ -151,6 +156,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 
+	m.filter()
 	m.fixYPosition()
 	m.fixCursor()
 
@@ -164,7 +170,7 @@ func (m *model) choice() {
 	}
 
 	if len(m.choices) == 0 && m.cursor >= 0 {
-		m.choices = append(m.choices, m.cursor)
+		m.choices = append(m.choices, m.matches[m.cursor].Index)
 	}
 }
 
@@ -175,19 +181,37 @@ func (m *model) cursorUp() {
 }
 
 func (m *model) cursorDown() {
-	if m.cursor+1 < m.items.Len() {
+	if m.cursor+1 < len(m.matches) {
 		m.cursor++
 	}
 }
 
+func (m *model) filter() {
+	var matches fuzzy.Matches
+
+	s := m.input.Value()
+	if s == "" {
+		for i := 0; i < m.items.Len(); i++ {
+			matches = append(matches, fuzzy.Match{
+				Str:   m.items.String(i),
+				Index: i,
+			})
+		}
+		m.matches = matches
+		return
+	}
+
+	m.matches = fuzzy.FindFrom(s, m.items)
+}
+
 func (m *model) fixCursor() {
-	if m.cursor < 0 && m.items.Len() > 0 {
+	if m.cursor < 0 && len(m.matches) > 0 {
 		m.cursor = 0
 		return
 	}
 
-	if m.cursor+1 > m.items.Len() {
-		m.cursor = m.items.Len() - 1
+	if m.cursor+1 > len(m.matches) {
+		m.cursor = len(m.matches) - 1
 		return
 	}
 }
@@ -195,7 +219,7 @@ func (m *model) fixCursor() {
 func (m *model) fixYPosition() {
 	headerHeight := lipgloss.Height(m.headerView())
 
-	if m.windowHeight-headerHeight > m.items.Len() {
+	if m.windowHeight-headerHeight > len(m.matches) {
 		m.windowYPosition = 0
 		return
 	}

@@ -11,6 +11,7 @@ var defaultOption = option{
 	inputPlaceholder: "Filter...",
 	styles: &styles{
 		CursorLine: lipgloss.NewStyle().Bold(true),
+		Matches:    lipgloss.NewStyle().Foreground(lipgloss.Color("#00ADD8")),
 	},
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
@@ -47,6 +48,9 @@ func WithStyles(ss *Styles) Option {
 	return func(o *option) {
 		if ss.CursorLine != nil {
 			o.styles.CursorLine = ss.CursorLine.lipgloss()
+		}
+		if ss.Matches != nil {
+			o.styles.Matches = ss.Matches.lipgloss()
 		}
 	}
 }

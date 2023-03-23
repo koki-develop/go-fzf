@@ -10,10 +10,12 @@ type Style struct {
 
 type Styles struct {
 	CursorLine *Style
+	Matches    *Style
 }
 
 type styles struct {
 	CursorLine lipgloss.Style
+	Matches    lipgloss.Style
 }
 
 func (s *Style) lipgloss() lipgloss.Style {

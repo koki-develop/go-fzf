@@ -18,7 +18,7 @@ func New(opts ...Option) *FZF {
 }
 
 func (fzf *FZF) Find(items Items) (int, error) {
-	m := newModel(fzf, items)
+	m := newModel(fzf, newItems(items))
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {

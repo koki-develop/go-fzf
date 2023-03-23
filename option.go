@@ -3,7 +3,8 @@ package fzf
 import "github.com/charmbracelet/bubbles/key"
 
 var defaultOption = option{
-	prompt: "> ",
+	prompt:      "> ",
+	placeholder: "Filter...",
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
 		Down:   key.NewBinding(key.WithKeys("down", "ctrl+n")),
@@ -14,8 +15,9 @@ var defaultOption = option{
 }
 
 type option struct {
-	prompt string
-	keymap *keymap
+	prompt      string
+	placeholder string
+	keymap      *keymap
 }
 
 type Option func(o *option)
@@ -43,5 +45,11 @@ func WithKeyMap(km *KeyMap) Option {
 		if len(km.Abort) > 0 {
 			o.keymap.Abort = key.NewBinding(key.WithKeys(km.Abort...))
 		}
+	}
+}
+
+func WithInputPlaceholder(p string) Option {
+	return func(o *option) {
+		o.placeholder = p
 	}
 }

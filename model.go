@@ -90,7 +90,7 @@ func (m *model) itemsView() string {
 		// write cursor
 		cursor := strings.Repeat(" ", cursorLen)
 		if m.cursor == i {
-			cursor = m.fzf.option.cursor
+			cursor = m.fzf.option.styles.Cursor.Render(m.fzf.option.cursor)
 		}
 		_, _ = v.WriteString(cursor)
 

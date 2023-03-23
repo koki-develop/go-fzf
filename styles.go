@@ -9,11 +9,13 @@ type Style struct {
 }
 
 type Styles struct {
+	Cursor     *Style
 	CursorLine *Style
 	Matches    *Style
 }
 
 type styles struct {
+	Cursor     lipgloss.Style
 	CursorLine lipgloss.Style
 	Matches    lipgloss.Style
 }

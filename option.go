@@ -7,11 +7,12 @@ import (
 
 var defaultOption = option{
 	prompt:           "> ",
-	cursor:           lipgloss.NewStyle().Foreground(lipgloss.Color("#00ADD8")).Render("> "),
+	cursor:           "> ",
 	inputPlaceholder: "Filter...",
 	styles: &styles{
+		Cursor:     lipgloss.NewStyle(),
 		CursorLine: lipgloss.NewStyle().Bold(true),
-		Matches:    lipgloss.NewStyle().Foreground(lipgloss.Color("#00ADD8")),
+		Matches:    lipgloss.NewStyle(),
 	},
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
@@ -46,6 +47,9 @@ func WithCursor(c string) Option {
 
 func WithStyles(ss *Styles) Option {
 	return func(o *option) {
+		if ss.Cursor != nil {
+			o.styles.Cursor = ss.Cursor.lipgloss()
+		}
 		if ss.CursorLine != nil {
 			o.styles.CursorLine = ss.CursorLine.lipgloss()
 		}

@@ -109,6 +109,11 @@ func (m *model) itemsView() string {
 			_, _ = v.WriteString(togglev.String())
 		}
 
+		// write item prefix
+		if m.fzf.option.itemPrefixFunc != nil {
+			v.WriteString(stringLinesToSpace(m.fzf.option.itemPrefixFunc(match.Index)))
+		}
+
 		// write item
 		var itemv strings.Builder
 		for ci, c := range match.Str {

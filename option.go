@@ -20,18 +20,23 @@ var defaultOption = option{
 		Choose: key.NewBinding(key.WithKeys("enter")),
 		Abort:  key.NewBinding(key.WithKeys("ctrl+c", "esc")),
 	},
+	itemPrefixFunc: nil,
 }
 
 type option struct {
-	limit            int
-	noLimit          bool
+	limit   int
+	noLimit bool
+
 	prompt           string
 	cursor           string
 	selectedPrefix   string
 	unselectedPrefix string
-	styles           *Styles
 	inputPlaceholder string
-	keymap           *keymap
+	styles           *Styles
+
+	keymap *keymap
+
+	itemPrefixFunc func(i int) string
 }
 
 // Option represents a option for the Fuzzy Finder.
@@ -111,5 +116,12 @@ func WithKeyMap(km KeyMap) Option {
 func WithInputPlaceholder(p string) Option {
 	return func(o *option) {
 		o.inputPlaceholder = p
+	}
+}
+
+// WithItemPrefix sets the prefix function of the item.
+func WithItemPrefix(f func(i int) string) Option {
+	return func(o *option) {
+		o.itemPrefixFunc = f
 	}
 }

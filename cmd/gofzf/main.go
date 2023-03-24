@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"runtime/debug"
 
 	"github.com/koki-develop/go-fzf"
 	"github.com/spf13/cobra"
@@ -14,6 +15,8 @@ const (
 )
 
 var (
+	version string
+
 	flagLimit   int
 	flagNoLimit bool
 )
@@ -73,6 +76,16 @@ func main() {
 }
 
 func init() {
+	// version
+	if version == "" {
+		if info, ok := debug.ReadBuildInfo(); ok {
+			version = info.Main.Version
+		}
+	}
+
+	rootCmd.Version = version
+
+	// flags
 	rootCmd.Flags().IntVarP(&flagLimit, "limit", "l", 1, "maximum number of items to select")
 	rootCmd.Flags().BoolVar(&flagNoLimit, "no-limit", false, "unlimited number of items to select")
 }

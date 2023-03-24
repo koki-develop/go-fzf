@@ -17,7 +17,7 @@ var (
 
 type model struct {
 	fzf   *FZF
-	items items
+	items *items
 
 	// state
 	abort   bool
@@ -34,7 +34,7 @@ type model struct {
 	input textinput.Model
 }
 
-func newModel(fzf *FZF, items items) *model {
+func newModel(fzf *FZF, items *items) *model {
 	input := textinput.New()
 	input.Prompt = fzf.option.prompt
 	input.Placeholder = fzf.option.inputPlaceholder

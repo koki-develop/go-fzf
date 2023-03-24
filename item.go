@@ -1,24 +1,29 @@
 package fzf
 
-// Items is a list of items to be searched by the Fuzzy Finder.
-type Items interface {
-	// ItemString returns the string of the i-th item in Items.
-	ItemString(i int) string
-
-	// Len returns the number of items in Items.
-	Len() int
-}
+import (
+	"fmt"
+	"reflect"
+)
 
 type items struct {
-	items Items
+	items    reflect.Value
+	itemFunc func(i int) string
 }
 
-func newItems(is Items) items {
-	return items{is}
+func newItems(is interface{}, itemFunc func(i int) string) (*items, error) {
+	rv := reflect.ValueOf(is)
+	if rv.Kind() != reflect.Slice {
+		return nil, fmt.Errorf("items must be a slice, but got %T", is)
+	}
+
+	return &items{
+		items:    rv,
+		itemFunc: itemFunc,
+	}, nil
 }
 
 func (is items) String(i int) string {
-	return stringLinesToSpace(is.items.ItemString(i))
+	return stringLinesToSpace(is.itemFunc(i))
 }
 
 func (is items) Len() int {

@@ -20,8 +20,12 @@ func New(opts ...Option) *FZF {
 }
 
 // Find launches the Fuzzy Finder and returns a list of indexes of the selected items.
-func (fzf *FZF) Find(items Items) ([]int, error) {
-	m := newModel(fzf, newItems(items))
+func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string) ([]int, error) {
+	is, err := newItems(items, itemFunc)
+	if err != nil {
+		return nil, err
+	}
+	m := newModel(fzf, is)
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {

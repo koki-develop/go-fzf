@@ -21,27 +21,13 @@ var (
 	flagNoLimit bool
 )
 
-type items []string
-
-var (
-	_ fzf.Items = (items)(nil)
-)
-
-func (is items) ItemString(i int) string {
-	return is[i]
-}
-
-func (is items) Len() int {
-	return len(is)
-}
-
 var rootCmd = &cobra.Command{
 	Use:          "gofzf",
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		sc := bufio.NewScanner(os.Stdin)
 
-		var is items
+		var is []string
 		for sc.Scan() {
 			is = append(is, sc.Text())
 		}
@@ -57,7 +43,7 @@ var rootCmd = &cobra.Command{
 				fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),
 			),
 		)
-		choices, err := f.Find(is)
+		choices, err := f.Find(is, func(i int) string { return is[i] })
 		if err != nil {
 			return err
 		}

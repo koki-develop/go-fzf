@@ -5,14 +5,16 @@ import (
 )
 
 var defaultOption = option{
-	limit:            1,
-	noLimit:          false,
+	limit:   1,
+	noLimit: false,
+
 	prompt:           "> ",
 	cursor:           "> ",
 	selectedPrefix:   "● ",
 	unselectedPrefix: "◯ ",
 	inputPlaceholder: "Filter...",
 	styles:           NewStyles(),
+
 	keymap: &keymap{
 		Up:     key.NewBinding(key.WithKeys("up", "ctrl+p")),
 		Down:   key.NewBinding(key.WithKeys("down", "ctrl+n")),
@@ -20,6 +22,7 @@ var defaultOption = option{
 		Choose: key.NewBinding(key.WithKeys("enter")),
 		Abort:  key.NewBinding(key.WithKeys("ctrl+c", "esc")),
 	},
+
 	itemPrefixFunc: nil,
 }
 

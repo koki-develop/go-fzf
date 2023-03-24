@@ -16,9 +16,62 @@ const (
 
 var (
 	version string
+)
 
+var (
 	flagLimit   int
 	flagNoLimit bool
+
+	flagPrompt           string
+	flagCursor           string
+	flagSelectedPrefix   string
+	flagUnselectedPrefix string
+	flagInputPlaceholder string
+
+	flagCursorFg            string
+	flagCursorBg            string
+	flagCursorBold          bool
+	flagCursorBlink         bool
+	flagCursorItalic        bool
+	flagCursorStrikethrough bool
+	flagCursorUnderline     bool
+	flagCursorFaint         bool
+
+	flagCursorLineFg            string
+	flagCursorLineBg            string
+	flagCursorLineBold          bool
+	flagCursorLineBlink         bool
+	flagCursorLineItalic        bool
+	flagCursorLineStrikethrough bool
+	flagCursorLineUnderline     bool
+	flagCursorLineFaint         bool
+
+	flagSelectedPrefixFg            string
+	flagSelectedPrefixBg            string
+	flagSelectedPrefixBold          bool
+	flagSelectedPrefixBlink         bool
+	flagSelectedPrefixItalic        bool
+	flagSelectedPrefixStrikethrough bool
+	flagSelectedPrefixUnderline     bool
+	flagSelectedPrefixFaint         bool
+
+	flagUnselectedPrefixFg            string
+	flagUnselectedPrefixBg            string
+	flagUnselectedPrefixBold          bool
+	flagUnselectedPrefixBlink         bool
+	flagUnselectedPrefixItalic        bool
+	flagUnselectedPrefixStrikethrough bool
+	flagUnselectedPrefixUnderline     bool
+	flagUnselectedPrefixFaint         bool
+
+	flagMatchesFg            string
+	flagMatchesBg            string
+	flagMatchesBold          bool
+	flagMatchesBlink         bool
+	flagMatchesItalic        bool
+	flagMatchesStrikethrough bool
+	flagMatchesUnderline     bool
+	flagMatchesFaint         bool
 )
 
 var rootCmd = &cobra.Command{
@@ -35,12 +88,63 @@ var rootCmd = &cobra.Command{
 		f := fzf.New(
 			fzf.WithNoLimit(flagNoLimit),
 			fzf.WithLimit(flagLimit),
+
+			fzf.WithPrompt(flagPrompt),
+			fzf.WithCursor(flagCursor),
+			fzf.WithSelectedPrefix(flagSelectedPrefix),
+			fzf.WithUnselectedPrefix(flagUnselectedPrefix),
+			fzf.WithInputPlaceholder(flagInputPlaceholder),
 			fzf.WithStyles(
-				fzf.WithStyleCursor(fzf.Style{ForegroundColor: mainColor}),
-				fzf.WithStyleCursorLine(fzf.Style{Bold: true}),
-				fzf.WithStyleMatches(fzf.Style{ForegroundColor: mainColor}),
-				fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: mainColor}),
-				fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),
+				fzf.WithStyleCursor(fzf.Style{
+					ForegroundColor: flagCursorFg,
+					BackgroundColor: flagCursorBg,
+					Bold:            flagCursorBold,
+					Blink:           flagCursorBlink,
+					Italic:          flagCursorItalic,
+					Strikethrough:   flagCursorStrikethrough,
+					Underline:       flagCursorUnderline,
+					Faint:           flagCursorFaint,
+				}),
+				fzf.WithStyleCursorLine(fzf.Style{
+					ForegroundColor: flagCursorLineFg,
+					BackgroundColor: flagCursorLineBg,
+					Bold:            flagCursorLineBold,
+					Blink:           flagCursorLineBlink,
+					Italic:          flagCursorLineItalic,
+					Strikethrough:   flagCursorLineStrikethrough,
+					Underline:       flagCursorLineUnderline,
+					Faint:           flagCursorLineFaint,
+				}),
+				fzf.WithStyleSelectedPrefix(fzf.Style{
+					ForegroundColor: flagSelectedPrefixFg,
+					BackgroundColor: flagSelectedPrefixBg,
+					Bold:            flagSelectedPrefixBold,
+					Blink:           flagSelectedPrefixBlink,
+					Italic:          flagSelectedPrefixItalic,
+					Strikethrough:   flagSelectedPrefixStrikethrough,
+					Underline:       flagSelectedPrefixUnderline,
+					Faint:           flagSelectedPrefixFaint,
+				}),
+				fzf.WithStyleUnselectedPrefix(fzf.Style{
+					ForegroundColor: flagUnselectedPrefixFg,
+					BackgroundColor: flagUnselectedPrefixBg,
+					Bold:            flagUnselectedPrefixBold,
+					Blink:           flagUnselectedPrefixBlink,
+					Italic:          flagUnselectedPrefixItalic,
+					Strikethrough:   flagUnselectedPrefixStrikethrough,
+					Underline:       flagUnselectedPrefixUnderline,
+					Faint:           flagUnselectedPrefixFaint,
+				}),
+				fzf.WithStyleMatches(fzf.Style{
+					ForegroundColor: flagMatchesFg,
+					BackgroundColor: flagMatchesBg,
+					Bold:            flagMatchesBold,
+					Blink:           flagMatchesBlink,
+					Italic:          flagMatchesItalic,
+					Strikethrough:   flagMatchesStrikethrough,
+					Underline:       flagMatchesUnderline,
+					Faint:           flagMatchesFaint,
+				}),
 			),
 		)
 		choices, err := f.Find(is, func(i int) string { return is[i] })
@@ -72,6 +176,60 @@ func init() {
 	rootCmd.Version = version
 
 	// flags
-	rootCmd.Flags().IntVarP(&flagLimit, "limit", "l", 1, "maximum number of items to select")
+	rootCmd.Flags().SortFlags = false
+
+	rootCmd.Flags().IntVar(&flagLimit, "limit", 1, "maximum number of items to select")
 	rootCmd.Flags().BoolVar(&flagNoLimit, "no-limit", false, "unlimited number of items to select")
+	rootCmd.MarkFlagsMutuallyExclusive("limit", "no-limit")
+
+	rootCmd.Flags().StringVar(&flagPrompt, "prompt", "> ", "")
+	rootCmd.Flags().StringVar(&flagCursor, "cursor", "> ", "")
+	rootCmd.Flags().StringVar(&flagSelectedPrefix, "selected-prefix", "● ", "")
+	rootCmd.Flags().StringVar(&flagUnselectedPrefix, "unselected-prefix", "◯ ", "")
+	rootCmd.Flags().StringVar(&flagInputPlaceholder, "input-placeholder", "Filter...", "")
+
+	rootCmd.Flags().StringVar(&flagCursorFg, "cursor-fg", mainColor, "")
+	rootCmd.Flags().StringVar(&flagCursorBg, "cursor-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagCursorBold, "cursor-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorBlink, "cursor-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorItalic, "cursor-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorStrikethrough, "cursor-strike", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorUnderline, "cursor-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorFaint, "cursor-faint", false, "")
+
+	rootCmd.Flags().StringVar(&flagCursorLineFg, "cursorline-fg", "", "")
+	rootCmd.Flags().StringVar(&flagCursorLineBg, "cursorline-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagCursorLineBold, "cursorline-bold", true, "")
+	rootCmd.Flags().BoolVar(&flagCursorLineBlink, "cursorline-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorLineItalic, "cursorline-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorLineStrikethrough, "cursorline-strke", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorLineUnderline, "cursorline-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagCursorLineFaint, "cursorline-faint", false, "")
+
+	rootCmd.Flags().StringVar(&flagSelectedPrefixFg, "selected-prefix-fg", mainColor, "")
+	rootCmd.Flags().StringVar(&flagSelectedPrefixBg, "selected-prefix-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagSelectedPrefixBold, "selected-prefix-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagSelectedPrefixBlink, "selected-prefix-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagSelectedPrefixItalic, "selected-prefix-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagSelectedPrefixStrikethrough, "selected-prefix-strke", false, "")
+	rootCmd.Flags().BoolVar(&flagSelectedPrefixUnderline, "selected-prefix-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagSelectedPrefixFaint, "selected-prefix-faint", false, "")
+
+	rootCmd.Flags().StringVar(&flagUnselectedPrefixFg, "unselected-prefix-fg", "", "")
+	rootCmd.Flags().StringVar(&flagUnselectedPrefixBg, "unselected-prefix-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagUnselectedPrefixBold, "unselected-prefix-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagUnselectedPrefixBlink, "unselected-prefix-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagUnselectedPrefixItalic, "unselected-prefix-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagUnselectedPrefixStrikethrough, "unselected-prefix-strke", false, "")
+	rootCmd.Flags().BoolVar(&flagUnselectedPrefixUnderline, "unselected-prefix-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagUnselectedPrefixFaint, "unselected-prefix-faint", true, "")
+
+	rootCmd.Flags().StringVar(&flagMatchesFg, "matches-fg", mainColor, "")
+	rootCmd.Flags().StringVar(&flagMatchesBg, "matches-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagMatchesBold, "matches-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagMatchesBlink, "matches-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagMatchesItalic, "matches-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagMatchesStrikethrough, "matches-strke", false, "")
+	rootCmd.Flags().BoolVar(&flagMatchesUnderline, "matches-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagMatchesFaint, "matches-faint", false, "")
 }

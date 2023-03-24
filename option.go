@@ -78,7 +78,7 @@ func WithStyles(opts ...StylesOption) Option {
 	}
 }
 
-func WithKeyMap(km *KeyMap) Option {
+func WithKeyMap(km KeyMap) Option {
 	return func(o *option) {
 		if len(km.Up) > 0 {
 			o.keymap.Up = key.NewBinding(key.WithKeys(km.Up...))

@@ -4,9 +4,11 @@ import "github.com/charmbracelet/lipgloss"
 
 var (
 	defaultStylesOption = &stylesOption{
-		cursor:     lipgloss.NewStyle(),
-		cursorLine: lipgloss.NewStyle(),
-		matches:    lipgloss.NewStyle(),
+		cursor:           lipgloss.NewStyle(),
+		cursorLine:       lipgloss.NewStyle(),
+		matches:          lipgloss.NewStyle(),
+		selectedPrefix:   lipgloss.NewStyle(),
+		unselectedPrefix: lipgloss.NewStyle(),
 	}
 )
 
@@ -23,9 +25,11 @@ type Styles struct {
 type StylesOption func(o *stylesOption)
 
 type stylesOption struct {
-	cursor     lipgloss.Style
-	cursorLine lipgloss.Style
-	matches    lipgloss.Style
+	cursor           lipgloss.Style
+	cursorLine       lipgloss.Style
+	selectedPrefix   lipgloss.Style
+	unselectedPrefix lipgloss.Style
+	matches          lipgloss.Style
 }
 
 func NewStyles(opts ...StylesOption) *Styles {
@@ -45,6 +49,18 @@ func WithStyleCursor(s Style) StylesOption {
 func WithStyleCursorLine(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.cursorLine = s.lipgloss()
+	}
+}
+
+func WithStyleSelectedPrefix(s Style) StylesOption {
+	return func(o *stylesOption) {
+		o.selectedPrefix = s.lipgloss()
+	}
+}
+
+func WithStyleUnselectedPrefix(s Style) StylesOption {
+	return func(o *stylesOption) {
+		o.unselectedPrefix = s.lipgloss()
 	}
 }
 

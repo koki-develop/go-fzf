@@ -102,9 +102,9 @@ func (m *model) itemsView() string {
 		if m.fzf.multiple() {
 			var togglev strings.Builder
 			if intContains(m.choices, match.Index) {
-				_, _ = togglev.WriteString(m.fzf.option.selectedPrefix)
+				_, _ = togglev.WriteString(m.fzf.option.styles.option.selectedPrefix.Render(m.fzf.option.selectedPrefix))
 			} else {
-				_, _ = togglev.WriteString(m.fzf.option.unselectedPrefix)
+				_, _ = togglev.WriteString(m.fzf.option.styles.option.unselectedPrefix.Render(m.fzf.option.unselectedPrefix))
 			}
 			_, _ = v.WriteString(togglev.String())
 		}

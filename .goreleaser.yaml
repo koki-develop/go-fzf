@@ -34,3 +34,9 @@ changelog:
     exclude:
       - '^docs:'
       - '^test:'
+
+brews:
+  - tap:
+      owner: koki-develop
+      name: homebrew-tap
+      token: "{{ .Env.TAP_GITHUB_TOKEN }}"

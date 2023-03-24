@@ -14,7 +14,7 @@ func newItems(is Items) items {
 }
 
 func (is items) String(i int) string {
-	return is.items.ItemString(i)
+	return stringLinesToSpace(is.items.ItemString(i))
 }
 
 func (is items) Len() int {

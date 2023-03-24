@@ -2,10 +2,12 @@ package fzf
 
 import tea "github.com/charmbracelet/bubbletea"
 
+// Fuzzy Finder.
 type FZF struct {
 	option *option
 }
 
+// New returns a new Fuzzy Finder.
 func New(opts ...Option) *FZF {
 	o := defaultOption
 	for _, opt := range opts {
@@ -17,6 +19,7 @@ func New(opts ...Option) *FZF {
 	}
 }
 
+// Find launches the Fuzzy Finder and returns a list of indexes of the selected items.
 func (fzf *FZF) Find(items Items) ([]int, error) {
 	m := newModel(fzf, newItems(items))
 

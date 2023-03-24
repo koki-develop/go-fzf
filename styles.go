@@ -12,6 +12,7 @@ var (
 	}
 )
 
+// Style represents a style.
 type Style struct {
 	ForegroundColor string
 	BackgroundColor string
@@ -23,6 +24,7 @@ type Style struct {
 	Faint           bool
 }
 
+// Styles is the styles for each component.
 type Styles struct {
 	option *stylesOption
 }
@@ -58,6 +60,7 @@ func (s *Style) lipgloss() lipgloss.Style {
 	return style
 }
 
+// Option represents a option for the styles.
 type StylesOption func(o *stylesOption)
 
 type stylesOption struct {
@@ -68,6 +71,7 @@ type stylesOption struct {
 	matches          lipgloss.Style
 }
 
+// NewStyles returns a new styles.
 func NewStyles(opts ...StylesOption) *Styles {
 	o := defaultStylesOption
 	for _, opt := range opts {
@@ -76,30 +80,35 @@ func NewStyles(opts ...StylesOption) *Styles {
 	return &Styles{option: o}
 }
 
+// WithStyleCursor sets the style of cursor.
 func WithStyleCursor(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.cursor = s.lipgloss()
 	}
 }
 
+// WithStyleCursorLine sets the style of cursor line.
 func WithStyleCursorLine(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.cursorLine = s.lipgloss()
 	}
 }
 
+// WithStyleSelectedPrefix sets the style of prefix of the selected item.
 func WithStyleSelectedPrefix(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.selectedPrefix = s.lipgloss()
 	}
 }
 
+// WithStyleUnselectedPrefix sets the style of prefix of the unselected item.
 func WithStyleUnselectedPrefix(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.unselectedPrefix = s.lipgloss()
 	}
 }
 
+// WithStyleMatches sets the style of the matched characters.
 func WithStyleMatches(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.matches = s.lipgloss()

@@ -2,6 +2,7 @@ package fzf
 
 import "github.com/charmbracelet/bubbles/key"
 
+// KeyMap is the key mapping for the Fuzzy Finder.
 type KeyMap struct {
 	Up     []string
 	Down   []string

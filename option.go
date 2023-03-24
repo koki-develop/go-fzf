@@ -34,50 +34,59 @@ type option struct {
 	keymap           *keymap
 }
 
+// Option represents a option for the Fuzzy Finder.
 type Option func(o *option)
 
+// WithLimit sets the number of items that can be selected.
 func WithLimit(l int) Option {
 	return func(o *option) {
 		o.limit = l
 	}
 }
 
+// WithNoLimit can be set to `true` to allow unlimited item selection.
 func WithNoLimit(n bool) Option {
 	return func(o *option) {
 		o.noLimit = n
 	}
 }
 
+// WithPrompt sets the prompt text.
 func WithPrompt(p string) Option {
 	return func(o *option) {
 		o.prompt = p
 	}
 }
 
+// WithCursor sets the cursor.
 func WithCursor(c string) Option {
 	return func(o *option) {
 		o.cursor = c
 	}
 }
 
+// WithSelectedPrefix sets the prefix of the selected item.
 func WithSelectedPrefix(p string) Option {
 	return func(o *option) {
 		o.selectedPrefix = p
 	}
 }
 
+// WithUnselectedPrefix sets the prefix of the unselected item.
 func WithUnselectedPrefix(p string) Option {
 	return func(o *option) {
 		o.unselectedPrefix = p
 	}
 }
 
+// WithStyles sets the various styles.
 func WithStyles(opts ...StylesOption) Option {
 	return func(o *option) {
 		o.styles = NewStyles(opts...)
 	}
 }
 
+// WithKeyMap sets the key mapping.
 func WithKeyMap(km KeyMap) Option {
 	return func(o *option) {
 		if len(km.Up) > 0 {
@@ -98,6 +107,7 @@ func WithKeyMap(km KeyMap) Option {
 	}
 }
 
+// WithInputPlaceholder sets the placeholder for input.
 func WithInputPlaceholder(p string) Option {
 	return func(o *option) {
 		o.inputPlaceholder = p

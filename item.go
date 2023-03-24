@@ -1,7 +1,11 @@
 package fzf
 
+// Items is a list of items to be searched by the Fuzzy Finder.
 type Items interface {
-	ItemString(int) string
+	// ItemString returns the string of the i-th item in Items.
+	ItemString(i int) string
+
+	// Len returns the number of items in Items.
 	Len() int
 }
 

@@ -196,7 +196,7 @@ func (m *model) toggle() {
 	if intContains(m.choices, match.Index) {
 		m.choices = intFilter(m.choices, func(i int) bool { return i != match.Index })
 	} else {
-		if !m.fzf.option.noLimit && len(m.choices) < m.fzf.option.limit {
+		if m.fzf.option.noLimit || len(m.choices) < m.fzf.option.limit {
 			m.choices = append(m.choices, match.Index)
 		}
 	}

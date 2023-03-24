@@ -84,7 +84,7 @@ func (m *model) itemsView() string {
 	var v strings.Builder
 
 	headerHeight := lipgloss.Height(m.headerView())
-	cursorLen := stringLen(m.fzf.option.cursor)
+	cursorLen := lipgloss.Width(m.fzf.option.cursor)
 
 	for i, match := range m.matches {
 		if i < m.windowYPosition {

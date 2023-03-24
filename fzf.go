@@ -22,11 +22,11 @@ func (fzf *FZF) Find(items Items) ([]int, error) {
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {
-		return []int{}, err
+		return nil, err
 	}
 
 	if m.abort {
-		return []int{}, ErrAbort
+		return nil, ErrAbort
 	}
 
 	return m.choices, nil

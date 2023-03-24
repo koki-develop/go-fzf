@@ -93,7 +93,7 @@ func WithKeyMap(km *KeyMap) Option {
 			o.keymap.Choose = key.NewBinding(key.WithKeys(km.Choose...))
 		}
 		if len(km.Abort) > 0 {
-			o.keymap.Abort = key.NewBinding(key.WithKeys(km.Abort...))
+			o.keymap.Abort = key.NewBinding(key.WithKeys(append(km.Abort, "ctrl+c")...))
 		}
 	}
 }

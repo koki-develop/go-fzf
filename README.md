@@ -1,5 +1,11 @@
 # go-fzf
 
+[![GitHub release (latest by date)](https://img.shields.io/github/v/release/koki-develop/go-fzf)](https://github.com/koki-develop/go-fzf/releases/latest)
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/koki-develop/go-fzf/ci.yml?logo=github)](https://github.com/koki-develop/go-fzf/actions/workflows/ci.yml)
+[![Maintainability](https://img.shields.io/codeclimate/maintainability/koki-develop/go-fzf?style=flat&logo=codeclimate)](https://codeclimate.com/github/koki-develop/go-fzf/maintainability)
+[![Go Report Card](https://goreportcard.com/badge/github.com/koki-develop/go-fzf)](https://goreportcard.com/report/github.com/koki-develop/go-fzf)
+[![LICENSE](https://img.shields.io/github/license/koki-develop/go-fzf)](./LICENSE)
+
 Fuzzy Finder CLI and Library.
 
 - [Usage](#usage)

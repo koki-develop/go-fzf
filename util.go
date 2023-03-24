@@ -21,3 +21,13 @@ func intContains(is []int, i int) bool {
 	}
 	return false
 }
+
+func intFilter(is []int, f func(i int) bool) []int {
+	var rtn []int
+	for _, i := range is {
+		if f(i) {
+			is = append(is, i)
+		}
+	}
+	return rtn
+}

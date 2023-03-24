@@ -33,7 +33,7 @@ func (is items) Len() int {
 }
 
 var rootCmd = &cobra.Command{
-	Use:          "gfzf",
+	Use:          "gofzf",
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		sc := bufio.NewScanner(os.Stdin)

@@ -40,6 +40,10 @@ func newModel(fzf *FZF, items items) *model {
 	input.Placeholder = fzf.option.inputPlaceholder
 	input.Focus()
 
+	if !fzf.multiple() {
+		fzf.option.keymap.Toggle.SetEnabled(false)
+	}
+
 	return &model{
 		fzf:   fzf,
 		items: items,
@@ -94,6 +98,17 @@ func (m *model) itemsView() string {
 		}
 		_, _ = v.WriteString(cursor)
 
+		// write toggle
+		if m.fzf.multiple() {
+			var togglev strings.Builder
+			if intContains(m.choices, match.Index) {
+				_, _ = togglev.WriteString(m.fzf.option.selectedPrefix)
+			} else {
+				_, _ = togglev.WriteString(m.fzf.option.unselectedPrefix)
+			}
+			_, _ = v.WriteString(togglev.String())
+		}
+
 		// write item
 		var itemv strings.Builder
 		for ci, c := range match.Str {
@@ -135,6 +150,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			// choose
 			m.choice()
 			return m, tea.Quit
+		case key.Matches(msg, m.fzf.option.keymap.Toggle):
+			// toggle
+			m.toggle()
 		case key.Matches(msg, m.fzf.option.keymap.Up):
 			// up
 			m.cursorUp()
@@ -171,6 +189,21 @@ func (m *model) choice() {
 
 	if len(m.choices) == 0 && m.cursor >= 0 {
 		m.choices = append(m.choices, m.matches[m.cursor].Index)
+	}
+}
+
+func (m *model) toggle() {
+	if m.matches.Len() == 0 {
+		return
+	}
+
+	match := m.matches[m.cursor]
+	if intContains(m.choices, match.Index) {
+		m.choices = intFilter(m.choices, func(i int) bool { return i != match.Index })
+	} else {
+		if !m.fzf.option.noLimit && len(m.choices) < m.fzf.option.limit {
+			m.choices = append(m.choices, match.Index)
+		}
 	}
 }
 

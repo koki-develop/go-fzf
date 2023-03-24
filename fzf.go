@@ -17,20 +17,24 @@ func New(opts ...Option) *FZF {
 	}
 }
 
-func (fzf *FZF) Find(items Items) (int, error) {
+func (fzf *FZF) Find(items Items) ([]int, error) {
 	m := newModel(fzf, newItems(items))
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {
-		return 0, err
+		return []int{}, err
 	}
 
 	if m.abort {
-		return 0, ErrAbort
+		return []int{}, ErrAbort
 	}
 	if len(m.choices) == 0 {
-		return 0, ErrAbort
+		return []int{}, ErrAbort
 	}
 
-	return m.choices[0], nil
+	return m.choices, nil
+}
+
+func (fzf *FZF) multiple() bool {
+	return fzf.option.noLimit || fzf.option.limit > 1
 }

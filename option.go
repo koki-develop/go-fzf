@@ -5,8 +5,12 @@ import (
 )
 
 var defaultOption = option{
+	limit:            1,
+	noLimit:          false,
 	prompt:           "> ",
 	cursor:           "> ",
+	selectedPrefix:   "● ",
+	unselectedPrefix: "◯ ",
 	inputPlaceholder: "Filter...",
 	styles:           NewStyles(),
 	keymap: &keymap{
@@ -19,14 +23,30 @@ var defaultOption = option{
 }
 
 type option struct {
+	limit            int
+	noLimit          bool
 	prompt           string
 	cursor           string
+	selectedPrefix   string
+	unselectedPrefix string
 	styles           *Styles
 	inputPlaceholder string
 	keymap           *keymap
 }
 
 type Option func(o *option)
+
+func WithLimit(l int) Option {
+	return func(o *option) {
+		o.limit = l
+	}
+}
+
+func WithNoLimit(n bool) Option {
+	return func(o *option) {
+		o.noLimit = n
+	}
+}
 
 func WithPrompt(p string) Option {
 	return func(o *option) {
@@ -37,6 +57,18 @@ func WithPrompt(p string) Option {
 func WithCursor(c string) Option {
 	return func(o *option) {
 		o.cursor = c
+	}
+}
+
+func WithSelectedPrefix(p string) Option {
+	return func(o *option) {
+		o.selectedPrefix = p
+	}
+}
+
+func WithUnselectedPrefix(p string) Option {
+	return func(o *option) {
+		o.unselectedPrefix = p
 	}
 }
 

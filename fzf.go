@@ -28,9 +28,6 @@ func (fzf *FZF) Find(items Items) ([]int, error) {
 	if m.abort {
 		return []int{}, ErrAbort
 	}
-	if len(m.choices) == 0 {
-		return []int{}, ErrAbort
-	}
 
 	return m.choices, nil
 }

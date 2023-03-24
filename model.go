@@ -182,11 +182,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) choice() {
-	if m.items.Len() == 0 {
-		m.abort = true
-		return
-	}
-
 	if len(m.choices) == 0 && m.cursor >= 0 {
 		m.choices = append(m.choices, m.matches[m.cursor].Index)
 	}

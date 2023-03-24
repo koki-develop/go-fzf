@@ -3,7 +3,7 @@ package fzf
 import "github.com/charmbracelet/lipgloss"
 
 var (
-	defaultStylesOption = &stylesOption{
+	defaultStylesOption = stylesOption{
 		cursor:           lipgloss.NewStyle(),
 		cursorLine:       lipgloss.NewStyle(),
 		matches:          lipgloss.NewStyle(),
@@ -75,9 +75,9 @@ type stylesOption struct {
 func NewStyles(opts ...StylesOption) *Styles {
 	o := defaultStylesOption
 	for _, opt := range opts {
-		opt(o)
+		opt(&o)
 	}
-	return &Styles{option: o}
+	return &Styles{option: &o}
 }
 
 // WithStyleCursor sets the style of cursor.

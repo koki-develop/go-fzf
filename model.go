@@ -110,8 +110,8 @@ func (m *model) itemsView() string {
 		}
 
 		// write item prefix
-		if m.fzf.option.itemPrefixFunc != nil {
-			v.WriteString(stringLinesToSpace(m.fzf.option.itemPrefixFunc(match.Index)))
+		if m.items.HasItemPrefixFunc() {
+			v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
 		}
 
 		// write item

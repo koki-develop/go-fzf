@@ -20,8 +20,13 @@ func New(opts ...Option) *FZF {
 }
 
 // Find launches the Fuzzy Finder and returns a list of indexes of the selected items.
-func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string) ([]int, error) {
-	is, err := newItems(items, itemFunc)
+func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...FindOption) ([]int, error) {
+	o := defaultFindOption
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	is, err := newItems(items, itemFunc, o.itemPrefixFunc)
 	if err != nil {
 		return nil, err
 	}

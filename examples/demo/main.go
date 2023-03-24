@@ -10,13 +10,13 @@ import (
 func main() {
 	items := []string{"hello", "world", "foo", "bar"}
 
-	fzf := fzf.New(
+	f := fzf.New(
 		fzf.WithStyles(
 			fzf.WithStyleCursor(fzf.Style{ForegroundColor: "#ff0000"}),
 			fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#00ff00"}),
 		),
 	)
-	idxs, err := fzf.Find(items, func(i int) string { return items[i] })
+	idxs, err := f.Find(items, func(i int) string { return items[i] })
 	if err != nil {
 		log.Fatal(err)
 	}

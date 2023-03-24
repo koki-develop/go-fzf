@@ -50,6 +50,7 @@ var rootCmd = &cobra.Command{
 				fzf.WithStyleCursor(fzf.Style{ForegroundColor: mainColor}),
 				fzf.WithStyleCursorLine(fzf.Style{Bold: true}),
 				fzf.WithStyleMatches(fzf.Style{ForegroundColor: mainColor}),
+				fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: mainColor}),
 				fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),
 			),
 		)

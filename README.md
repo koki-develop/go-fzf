@@ -9,8 +9,8 @@
 Fuzzy Finder CLI and Library.
 
 - [Usage](#usage)
-  - [Using as a CLI](#using-as-a-cli)
-  - [Using as a Library](#using-as-a-library)
+  - [CLI](#using-as-a-cli)
+  - [Library](#using-as-a-library)
 - [LICENSE](#license)
 
 ## Usage

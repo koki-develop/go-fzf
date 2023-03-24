@@ -2,6 +2,10 @@ package fzf
 
 import tea "github.com/charmbracelet/bubbletea"
 
+var defaultFindOption = findOption{
+	itemPrefixFunc: nil,
+}
+
 // Fuzzy Finder.
 type FZF struct {
 	option *option
@@ -46,4 +50,18 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 
 func (fzf *FZF) multiple() bool {
 	return fzf.option.noLimit || fzf.option.limit > 1
+}
+
+// Option represents a option for the Find.
+type FindOption func(o *findOption)
+
+type findOption struct {
+	itemPrefixFunc func(i int) string
+}
+
+// WithItemPrefix sets the prefix function of the item.
+func WithItemPrefix(f func(i int) string) FindOption {
+	return func(o *findOption) {
+		o.itemPrefixFunc = f
+	}
 }

@@ -24,10 +24,6 @@ var defaultOption = option{
 	},
 }
 
-var defaultFindOption = findOption{
-	itemPrefixFunc: nil,
-}
-
 type option struct {
 	limit   int
 	noLimit bool
@@ -119,19 +115,5 @@ func WithKeyMap(km KeyMap) Option {
 func WithInputPlaceholder(p string) Option {
 	return func(o *option) {
 		o.inputPlaceholder = p
-	}
-}
-
-// Option represents a option for the Find.
-type FindOption func(o *findOption)
-
-type findOption struct {
-	itemPrefixFunc func(i int) string
-}
-
-// WithItemPrefix sets the prefix function of the item.
-func WithItemPrefix(f func(i int) string) FindOption {
-	return func(o *findOption) {
-		o.itemPrefixFunc = f
 	}
 }

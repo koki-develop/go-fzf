@@ -118,7 +118,7 @@ func (m *model) itemsView() string {
 
 		// write item prefix
 		if m.items.HasItemPrefixFunc() {
-			v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
+			_, _ = v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
 		}
 
 		// write item

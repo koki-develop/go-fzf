@@ -1,6 +1,11 @@
 package fzf
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"fmt"
+	"reflect"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
 
 var defaultFindOption = findOption{
 	itemPrefixFunc: nil,
@@ -30,7 +35,15 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 		opt(&o)
 	}
 
-	is, err := newItems(items, itemFunc, o.itemPrefixFunc)
+	rv := reflect.ValueOf(items)
+	switch {
+	case rv.Kind() == reflect.Slice:
+	case rv.Kind() == reflect.Ptr && reflect.Indirect(rv).Kind() == reflect.Slice:
+	default:
+		return nil, fmt.Errorf("items must be a slice, but got %T", items)
+	}
+
+	is, err := newItems(rv, itemFunc, o.itemPrefixFunc)
 	if err != nil {
 		return nil, err
 	}

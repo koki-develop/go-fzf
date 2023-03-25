@@ -30,6 +30,13 @@ type model struct {
 	nocursor       string
 	cursorPosition int
 
+	selectedPrefix   string
+	unselectedPrefix string
+
+	matchesStyle           lipgloss.Style
+	cursorLineStyle        lipgloss.Style
+	cursorLineMatchesStyle lipgloss.Style
+
 	matches fuzzy.Matches
 	choices []int
 
@@ -61,6 +68,13 @@ func newModel(fzf *FZF, items *items) *model {
 		cursor:         fzf.option.styles.option.cursor.Render(fzf.option.cursor),
 		nocursor:       strings.Repeat(" ", lipgloss.Width(fzf.option.cursor)),
 		cursorPosition: 0,
+
+		selectedPrefix:   fzf.option.styles.option.selectedPrefix.Render(fzf.option.selectedPrefix),
+		unselectedPrefix: fzf.option.styles.option.unselectedPrefix.Render(fzf.option.unselectedPrefix),
+
+		matchesStyle:           fzf.option.styles.option.matches,
+		cursorLineStyle:        fzf.option.styles.option.cursorLine,
+		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(fzf.option.styles.option.matches).Inherit(fzf.option.styles.option.cursorLine),
 
 		matches: fuzzy.Matches{},
 		choices: []int{},
@@ -96,10 +110,10 @@ func (m *model) itemsView() string {
 	var v strings.Builder
 
 	for i, match := range m.matches[m.windowYPosition:] {
-		currentLine := m.cursorPosition == match.Index
+		cursorLine := m.cursorPosition == i
 
 		// write cursor
-		if currentLine {
+		if cursorLine {
 			_, _ = v.WriteString(m.cursor)
 		} else {
 			_, _ = v.WriteString(m.nocursor)
@@ -107,13 +121,11 @@ func (m *model) itemsView() string {
 
 		// write toggle
 		if m.fzf.multiple() {
-			var togglev strings.Builder
 			if intContains(m.choices, match.Index) {
-				_, _ = togglev.WriteString(m.fzf.option.styles.option.selectedPrefix.Render(m.fzf.option.selectedPrefix))
+				_, _ = v.WriteString(m.selectedPrefix)
 			} else {
-				_, _ = togglev.WriteString(m.fzf.option.styles.option.unselectedPrefix.Render(m.fzf.option.unselectedPrefix))
+				_, _ = v.WriteString(m.unselectedPrefix)
 			}
-			_, _ = v.WriteString(togglev.String())
 		}
 
 		// write item prefix
@@ -122,19 +134,20 @@ func (m *model) itemsView() string {
 		}
 
 		// write item
-		var itemv strings.Builder
 		for ci, c := range match.Str {
 			// matches
-			style := lipgloss.NewStyle()
 			if intContains(match.MatchedIndexes, ci) {
-				style = style.Inherit(m.fzf.option.styles.option.matches)
+				if cursorLine {
+					_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
+				} else {
+					_, _ = v.WriteString(m.matchesStyle.Render(string(c)))
+				}
+			} else if cursorLine {
+				_, _ = v.WriteString(m.cursorLineStyle.Render(string(c)))
+			} else {
+				_, _ = v.WriteRune(c)
 			}
-			if m.cursorPosition == match.Index {
-				style = style.Inherit(m.fzf.option.styles.option.cursorLine)
-			}
-			_, _ = itemv.WriteString(style.Render(string(c)))
 		}
-		_, _ = v.WriteString(itemv.String())
 
 		if i+1 == m.windowHeight-headerHeight {
 			break

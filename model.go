@@ -89,14 +89,10 @@ func (m *model) itemsView() string {
 
 	cursorLen := lipgloss.Width(m.fzf.option.cursor)
 
-	for i, match := range m.matches {
-		if i < m.windowYPosition {
-			continue
-		}
-
+	for i, match := range m.matches[m.windowYPosition:] {
 		// write cursor
 		cursor := strings.Repeat(" ", cursorLen)
-		if m.cursor == i {
+		if m.cursor == match.Index {
 			cursor = m.fzf.option.styles.option.cursor.Render(m.fzf.option.cursor)
 		}
 		_, _ = v.WriteString(cursor)
@@ -125,14 +121,14 @@ func (m *model) itemsView() string {
 			if intContains(match.MatchedIndexes, ci) {
 				style = style.Inherit(m.fzf.option.styles.option.matches)
 			}
-			if i == m.cursor {
+			if m.cursor == match.Index {
 				style = style.Inherit(m.fzf.option.styles.option.cursorLine)
 			}
 			_, _ = itemv.WriteString(style.Render(string(c)))
 		}
 		_, _ = v.WriteString(itemv.String())
 
-		if i+1 == m.windowYPosition+(m.windowHeight-(headerHeight)) {
+		if i+1 == m.windowHeight-headerHeight {
 			break
 		}
 		v.WriteString("\n")

@@ -26,6 +26,7 @@ type model struct {
 	// state
 	abort          bool
 	cursorPosition int
+	cursorWidth    int
 	matches        fuzzy.Matches
 	choices        []int
 
@@ -54,6 +55,7 @@ func newModel(fzf *FZF, items *items) *model {
 		// state
 		abort:          false,
 		cursorPosition: 0,
+		cursorWidth:    lipgloss.Width(fzf.option.cursor),
 		matches:        fuzzy.Matches{},
 		choices:        []int{},
 		// window
@@ -87,11 +89,9 @@ func (m *model) headerView() string {
 func (m *model) itemsView() string {
 	var v strings.Builder
 
-	cursorLen := lipgloss.Width(m.fzf.option.cursor)
-
 	for i, match := range m.matches[m.windowYPosition:] {
 		// write cursor
-		cursor := strings.Repeat(" ", cursorLen)
+		cursor := strings.Repeat(" ", m.cursorWidth)
 		if m.cursorPosition == match.Index {
 			cursor = m.fzf.option.styles.option.cursor.Render(m.fzf.option.cursor)
 		}

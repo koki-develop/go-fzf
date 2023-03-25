@@ -24,11 +24,14 @@ type model struct {
 	items *items
 
 	// state
-	abort          bool
+	abort bool
+
+	cursor         string
+	nocursor       string
 	cursorPosition int
-	cursorWidth    int
-	matches        fuzzy.Matches
-	choices        []int
+
+	matches fuzzy.Matches
+	choices []int
 
 	// window
 	windowWidth     int
@@ -53,11 +56,14 @@ func newModel(fzf *FZF, items *items) *model {
 		fzf:   fzf,
 		items: items,
 		// state
-		abort:          false,
+		abort: false,
+
+		cursor:         fzf.option.styles.option.cursor.Render(fzf.option.cursor),
+		nocursor:       strings.Repeat(" ", lipgloss.Width(fzf.option.cursor)),
 		cursorPosition: 0,
-		cursorWidth:    lipgloss.Width(fzf.option.cursor),
-		matches:        fuzzy.Matches{},
-		choices:        []int{},
+
+		matches: fuzzy.Matches{},
+		choices: []int{},
 		// window
 		windowWidth:     0,
 		windowHeight:    0,
@@ -90,12 +96,14 @@ func (m *model) itemsView() string {
 	var v strings.Builder
 
 	for i, match := range m.matches[m.windowYPosition:] {
+		currentLine := m.cursorPosition == match.Index
+
 		// write cursor
-		cursor := strings.Repeat(" ", m.cursorWidth)
-		if m.cursorPosition == match.Index {
-			cursor = m.fzf.option.styles.option.cursor.Render(m.fzf.option.cursor)
+		if currentLine {
+			_, _ = v.WriteString(m.cursor)
+		} else {
+			_, _ = v.WriteString(m.nocursor)
 		}
-		_, _ = v.WriteString(cursor)
 
 		// write toggle
 		if m.fzf.multiple() {

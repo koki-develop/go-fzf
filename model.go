@@ -15,13 +15,28 @@ var (
 	_ tea.Model = (*model)(nil)
 )
 
+const (
+	headerHeight = 1
+)
+
 type model struct {
 	fzf   *FZF
 	items *items
 
 	// state
-	abort   bool
-	cursor  int
+	abort bool
+
+	cursor         string
+	nocursor       string
+	cursorPosition int
+
+	selectedPrefix   string
+	unselectedPrefix string
+
+	matchesStyle           lipgloss.Style
+	cursorLineStyle        lipgloss.Style
+	cursorLineMatchesStyle lipgloss.Style
+
 	matches fuzzy.Matches
 	choices []int
 
@@ -48,8 +63,19 @@ func newModel(fzf *FZF, items *items) *model {
 		fzf:   fzf,
 		items: items,
 		// state
-		abort:   false,
-		cursor:  0,
+		abort: false,
+
+		cursor:         fzf.option.styles.option.cursor.Render(fzf.option.cursor),
+		nocursor:       strings.Repeat(" ", lipgloss.Width(fzf.option.cursor)),
+		cursorPosition: 0,
+
+		selectedPrefix:   fzf.option.styles.option.selectedPrefix.Render(fzf.option.selectedPrefix),
+		unselectedPrefix: fzf.option.styles.option.unselectedPrefix.Render(fzf.option.unselectedPrefix),
+
+		matchesStyle:           fzf.option.styles.option.matches,
+		cursorLineStyle:        fzf.option.styles.option.cursorLine,
+		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(fzf.option.styles.option.matches).Inherit(fzf.option.styles.option.cursorLine),
+
 		matches: fuzzy.Matches{},
 		choices: []int{},
 		// window
@@ -83,53 +109,47 @@ func (m *model) headerView() string {
 func (m *model) itemsView() string {
 	var v strings.Builder
 
-	headerHeight := lipgloss.Height(m.headerView())
-	cursorLen := lipgloss.Width(m.fzf.option.cursor)
-
-	for i, match := range m.matches {
-		if i < m.windowYPosition {
-			continue
-		}
+	for i, match := range m.matches[m.windowYPosition:] {
+		cursorLine := m.cursorPosition == i
 
 		// write cursor
-		cursor := strings.Repeat(" ", cursorLen)
-		if m.cursor == i {
-			cursor = m.fzf.option.styles.option.cursor.Render(m.fzf.option.cursor)
+		if cursorLine {
+			_, _ = v.WriteString(m.cursor)
+		} else {
+			_, _ = v.WriteString(m.nocursor)
 		}
-		_, _ = v.WriteString(cursor)
 
 		// write toggle
 		if m.fzf.multiple() {
-			var togglev strings.Builder
 			if intContains(m.choices, match.Index) {
-				_, _ = togglev.WriteString(m.fzf.option.styles.option.selectedPrefix.Render(m.fzf.option.selectedPrefix))
+				_, _ = v.WriteString(m.selectedPrefix)
 			} else {
-				_, _ = togglev.WriteString(m.fzf.option.styles.option.unselectedPrefix.Render(m.fzf.option.unselectedPrefix))
+				_, _ = v.WriteString(m.unselectedPrefix)
 			}
-			_, _ = v.WriteString(togglev.String())
 		}
 
 		// write item prefix
 		if m.items.HasItemPrefixFunc() {
-			v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
+			_, _ = v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
 		}
 
 		// write item
-		var itemv strings.Builder
 		for ci, c := range match.Str {
 			// matches
-			style := lipgloss.NewStyle()
 			if intContains(match.MatchedIndexes, ci) {
-				style = style.Inherit(m.fzf.option.styles.option.matches)
+				if cursorLine {
+					_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
+				} else {
+					_, _ = v.WriteString(m.matchesStyle.Render(string(c)))
+				}
+			} else if cursorLine {
+				_, _ = v.WriteString(m.cursorLineStyle.Render(string(c)))
+			} else {
+				_, _ = v.WriteRune(c)
 			}
-			if i == m.cursor {
-				style = style.Inherit(m.fzf.option.styles.option.cursorLine)
-			}
-			_, _ = itemv.WriteString(style.Render(string(c)))
 		}
-		_, _ = v.WriteString(itemv.String())
 
-		if i+1 == m.windowYPosition+(m.windowHeight-(headerHeight)) {
+		if i+1 == m.windowHeight-headerHeight {
 			break
 		}
 		v.WriteString("\n")
@@ -187,8 +207,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) choice() {
-	if len(m.choices) == 0 && m.cursor >= 0 {
-		m.choices = append(m.choices, m.matches[m.cursor].Index)
+	if len(m.choices) == 0 && m.cursorPosition >= 0 {
+		m.choices = append(m.choices, m.matches[m.cursorPosition].Index)
 	}
 }
 
@@ -197,7 +217,7 @@ func (m *model) toggle() {
 		return
 	}
 
-	match := m.matches[m.cursor]
+	match := m.matches[m.cursorPosition]
 	if intContains(m.choices, match.Index) {
 		m.choices = intFilter(m.choices, func(i int) bool { return i != match.Index })
 	} else {
@@ -208,14 +228,14 @@ func (m *model) toggle() {
 }
 
 func (m *model) cursorUp() {
-	if m.cursor > 0 {
-		m.cursor--
+	if m.cursorPosition > 0 {
+		m.cursorPosition--
 	}
 }
 
 func (m *model) cursorDown() {
-	if m.cursor+1 < len(m.matches) {
-		m.cursor++
+	if m.cursorPosition+1 < len(m.matches) {
+		m.cursorPosition++
 	}
 }
 
@@ -238,32 +258,30 @@ func (m *model) filter() {
 }
 
 func (m *model) fixCursor() {
-	if m.cursor < 0 && len(m.matches) > 0 {
-		m.cursor = 0
+	if m.cursorPosition < 0 && len(m.matches) > 0 {
+		m.cursorPosition = 0
 		return
 	}
 
-	if m.cursor+1 > len(m.matches) {
-		m.cursor = len(m.matches) - 1
+	if m.cursorPosition+1 > len(m.matches) {
+		m.cursorPosition = len(m.matches) - 1
 		return
 	}
 }
 
 func (m *model) fixYPosition() {
-	headerHeight := lipgloss.Height(m.headerView())
-
 	if m.windowHeight-headerHeight > len(m.matches) {
 		m.windowYPosition = 0
 		return
 	}
 
-	if m.cursor < m.windowYPosition {
-		m.windowYPosition = m.cursor
+	if m.cursorPosition < m.windowYPosition {
+		m.windowYPosition = m.cursorPosition
 		return
 	}
 
-	if m.cursor+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
-		m.windowYPosition = m.cursor + 1 - (m.windowHeight - headerHeight)
+	if m.cursorPosition+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
+		m.windowYPosition = m.cursorPosition + 1 - (m.windowHeight - headerHeight)
 		return
 	}
 }

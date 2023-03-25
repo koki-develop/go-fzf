@@ -24,10 +24,10 @@ type model struct {
 	items *items
 
 	// state
-	abort   bool
-	cursor  int
-	matches fuzzy.Matches
-	choices []int
+	abort          bool
+	cursorPosition int
+	matches        fuzzy.Matches
+	choices        []int
 
 	// window
 	windowWidth     int
@@ -52,10 +52,10 @@ func newModel(fzf *FZF, items *items) *model {
 		fzf:   fzf,
 		items: items,
 		// state
-		abort:   false,
-		cursor:  0,
-		matches: fuzzy.Matches{},
-		choices: []int{},
+		abort:          false,
+		cursorPosition: 0,
+		matches:        fuzzy.Matches{},
+		choices:        []int{},
 		// window
 		windowWidth:     0,
 		windowHeight:    0,
@@ -92,7 +92,7 @@ func (m *model) itemsView() string {
 	for i, match := range m.matches[m.windowYPosition:] {
 		// write cursor
 		cursor := strings.Repeat(" ", cursorLen)
-		if m.cursor == match.Index {
+		if m.cursorPosition == match.Index {
 			cursor = m.fzf.option.styles.option.cursor.Render(m.fzf.option.cursor)
 		}
 		_, _ = v.WriteString(cursor)
@@ -121,7 +121,7 @@ func (m *model) itemsView() string {
 			if intContains(match.MatchedIndexes, ci) {
 				style = style.Inherit(m.fzf.option.styles.option.matches)
 			}
-			if m.cursor == match.Index {
+			if m.cursorPosition == match.Index {
 				style = style.Inherit(m.fzf.option.styles.option.cursorLine)
 			}
 			_, _ = itemv.WriteString(style.Render(string(c)))
@@ -186,8 +186,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) choice() {
-	if len(m.choices) == 0 && m.cursor >= 0 {
-		m.choices = append(m.choices, m.matches[m.cursor].Index)
+	if len(m.choices) == 0 && m.cursorPosition >= 0 {
+		m.choices = append(m.choices, m.matches[m.cursorPosition].Index)
 	}
 }
 
@@ -196,7 +196,7 @@ func (m *model) toggle() {
 		return
 	}
 
-	match := m.matches[m.cursor]
+	match := m.matches[m.cursorPosition]
 	if intContains(m.choices, match.Index) {
 		m.choices = intFilter(m.choices, func(i int) bool { return i != match.Index })
 	} else {
@@ -207,14 +207,14 @@ func (m *model) toggle() {
 }
 
 func (m *model) cursorUp() {
-	if m.cursor > 0 {
-		m.cursor--
+	if m.cursorPosition > 0 {
+		m.cursorPosition--
 	}
 }
 
 func (m *model) cursorDown() {
-	if m.cursor+1 < len(m.matches) {
-		m.cursor++
+	if m.cursorPosition+1 < len(m.matches) {
+		m.cursorPosition++
 	}
 }
 
@@ -237,13 +237,13 @@ func (m *model) filter() {
 }
 
 func (m *model) fixCursor() {
-	if m.cursor < 0 && len(m.matches) > 0 {
-		m.cursor = 0
+	if m.cursorPosition < 0 && len(m.matches) > 0 {
+		m.cursorPosition = 0
 		return
 	}
 
-	if m.cursor+1 > len(m.matches) {
-		m.cursor = len(m.matches) - 1
+	if m.cursorPosition+1 > len(m.matches) {
+		m.cursorPosition = len(m.matches) - 1
 		return
 	}
 }
@@ -254,13 +254,13 @@ func (m *model) fixYPosition() {
 		return
 	}
 
-	if m.cursor < m.windowYPosition {
-		m.windowYPosition = m.cursor
+	if m.cursorPosition < m.windowYPosition {
+		m.windowYPosition = m.cursorPosition
 		return
 	}
 
-	if m.cursor+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
-		m.windowYPosition = m.cursor + 1 - (m.windowHeight - headerHeight)
+	if m.cursorPosition+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
+		m.windowYPosition = m.cursorPosition + 1 - (m.windowHeight - headerHeight)
 		return
 	}
 }

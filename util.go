@@ -28,3 +28,11 @@ func intFilter(is []int, f func(i int) bool) []int {
 	}
 	return rtn
 }
+
+func max(l, r int) int {
+	if l < r {
+		return r
+	} else {
+		return l
+	}
+}

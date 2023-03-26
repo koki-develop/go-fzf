@@ -25,6 +25,8 @@ type model struct {
 	nocursor       string
 	cursorPosition int
 
+	promptWidth int
+
 	selectedPrefix   string
 	unselectedPrefix string
 
@@ -63,6 +65,8 @@ func newModel(fzf *FZF, items *items) *model {
 		cursor:         fzf.option.styles.option.cursor.Render(fzf.option.cursor),
 		nocursor:       strings.Repeat(" ", lipgloss.Width(fzf.option.cursor)),
 		cursorPosition: 0,
+
+		promptWidth: lipgloss.Width(fzf.option.prompt),
 
 		selectedPrefix:   fzf.option.styles.option.selectedPrefix.Render(fzf.option.selectedPrefix),
 		unselectedPrefix: fzf.option.styles.option.unselectedPrefix.Render(fzf.option.unselectedPrefix),
@@ -206,7 +210,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// window
 		m.windowWidth = msg.Width
 		m.windowHeight = msg.Height
-		m.input.Width = m.windowWidth - 3
+		m.input.Width = m.windowWidth - m.promptWidth
 	}
 
 	var cmds []tea.Cmd

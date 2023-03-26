@@ -80,9 +80,9 @@ var rootCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		sc := bufio.NewScanner(os.Stdin)
 
-		var is []string
+		var items []string
 		for sc.Scan() {
-			is = append(is, sc.Text())
+			items = append(items, sc.Text())
 		}
 
 		f := fzf.New(
@@ -147,13 +147,13 @@ var rootCmd = &cobra.Command{
 				}),
 			),
 		)
-		choices, err := f.Find(is, func(i int) string { return is[i] })
+		choices, err := f.Find(items, func(i int) string { return items[i] })
 		if err != nil {
 			return err
 		}
 
 		for _, choice := range choices {
-			fmt.Println(is[choice])
+			fmt.Println(items[choice])
 		}
 		return nil
 	},

@@ -55,7 +55,7 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 	if err != nil {
 		return nil, err
 	}
-	fzf.model.setItems(is)
+	fzf.model.loadItems(is)
 	fzf.model.setFindOption(&findOption)
 
 	if _, err := fzf.program.Run(); err != nil {

@@ -86,7 +86,7 @@ func newModel(opt *option) *model {
 	}
 }
 
-func (m *model) setItems(items *items) {
+func (m *model) loadItems(items *items) {
 	var matches matches
 	for i := 0; i < items.Len(); i++ {
 		matches = append(matches, match{
@@ -360,7 +360,7 @@ func (m *model) fixYPosition() {
 func (m *model) forceReload() {
 	m.option.hotReloadLocker.Lock()
 	defer m.option.hotReloadLocker.Unlock()
-	m.setItems(m.items)
+	m.loadItems(m.items)
 }
 
 func (m *model) watchReload() tea.Cmd {
@@ -369,7 +369,7 @@ func (m *model) watchReload() tea.Cmd {
 		defer m.option.hotReloadLocker.Unlock()
 
 		if m.itemsLen != m.items.Len() {
-			m.setItems(m.items)
+			m.loadItems(m.items)
 		}
 
 		return watchReloadMsg{}

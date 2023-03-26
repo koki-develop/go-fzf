@@ -57,6 +57,14 @@ func newModel(fzf *FZF, items *items, opt *findOption) *model {
 		fzf.option.keymap.Toggle.SetEnabled(false)
 	}
 
+	var matches fuzzy.Matches
+	for i := 0; i < items.Len(); i++ {
+		matches = append(matches, fuzzy.Match{
+			Str:   items.String(i),
+			Index: i,
+		})
+	}
+
 	return &model{
 		fzf:        fzf,
 		items:      items,
@@ -77,7 +85,7 @@ func newModel(fzf *FZF, items *items, opt *findOption) *model {
 		cursorLineStyle:        fzf.option.styles.option.cursorLine,
 		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(fzf.option.styles.option.matches).Inherit(fzf.option.styles.option.cursorLine),
 
-		matches: fuzzy.Matches{},
+		matches: matches,
 		choices: []int{},
 		// window
 		windowWidth:     0,
@@ -204,9 +212,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.fzf.option.keymap.Up):
 			// up
 			m.cursorUp()
+			m.fixYPosition()
+			m.fixCursor()
 		case key.Matches(msg, m.fzf.option.keymap.Down):
 			// down
 			m.cursorDown()
+			m.fixYPosition()
+			m.fixCursor()
 		}
 	case tea.WindowSizeMsg:
 		// window
@@ -216,15 +228,17 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	}
 
 	var cmds []tea.Cmd
+	beforeValue := m.input.Value()
 	{
 		input, cmd := m.input.Update(msg)
 		m.input = input
 		cmds = append(cmds, cmd)
 	}
-
-	m.filter()
-	m.fixYPosition()
-	m.fixCursor()
+	if beforeValue != m.input.Value() {
+		m.filter()
+		m.fixYPosition()
+		m.fixCursor()
+	}
 
 	return m, tea.Batch(cmds...)
 }
@@ -269,10 +283,9 @@ func (m *model) cursorDown() {
 }
 
 func (m *model) filter() {
-	var matches fuzzy.Matches
-
 	s := m.input.Value()
 	if s == "" {
+		var matches fuzzy.Matches
 		for i := 0; i < m.items.Len(); i++ {
 			matches = append(matches, fuzzy.Match{
 				Str:   m.items.String(i),

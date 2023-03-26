@@ -14,6 +14,7 @@ var defaultFindOption = findOption{
 // Fuzzy Finder.
 type FZF struct {
 	option *option
+	model  *model
 }
 
 // New returns a new Fuzzy Finder.
@@ -23,8 +24,11 @@ func New(opts ...Option) *FZF {
 		opt(&o)
 	}
 
+	m := newModel(&o)
+
 	return &FZF{
 		option: &o,
+		model:  m,
 	}
 }
 
@@ -47,22 +51,19 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 	if err != nil {
 		return nil, err
 	}
-	m := newModel(fzf, is, &findOption)
+	fzf.model.setItems(is)
+	fzf.model.setFindOption(&findOption)
 
-	p := tea.NewProgram(m)
+	p := tea.NewProgram(fzf.model)
 	if _, err := p.Run(); err != nil {
 		return nil, err
 	}
 
-	if m.abort {
+	if fzf.model.abort {
 		return nil, ErrAbort
 	}
 
-	return m.choices, nil
-}
-
-func (fzf *FZF) multiple() bool {
-	return fzf.option.noLimit || fzf.option.limit > 1
+	return fzf.model.choices, nil
 }
 
 // Option represents a option for the Find.

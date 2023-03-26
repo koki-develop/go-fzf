@@ -2,14 +2,17 @@ package main
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"runtime/debug"
+	"sync"
 
 	"github.com/koki-develop/go-fzf"
 	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
 )
 
 const (
@@ -83,48 +86,13 @@ var rootCmd = &cobra.Command{
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var items []string
-
-		info, err := os.Stdin.Stat()
-		if err != nil {
-			return err
-		}
-
-		if info.Mode()&os.ModeCharDevice == 0 {
-			sc := bufio.NewScanner(os.Stdin)
-			for sc.Scan() {
-				items = append(items, sc.Text())
-			}
-		} else {
-			wd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
-			err = filepath.WalkDir(wd, func(path string, d fs.DirEntry, err error) error {
-				if err != nil {
-					return err
-				}
-
-				if d.Name()[0] == '.' {
-					if d.IsDir() {
-						return fs.SkipDir
-					}
-					return nil
-				}
-
-				if !d.IsDir() {
-					items = append(items, path)
-				}
-
-				return nil
-			})
-			if err != nil {
-				return err
-			}
-		}
+		var mu sync.RWMutex
 
 		f := fzf.New(
 			fzf.WithNoLimit(flagNoLimit),
 			fzf.WithLimit(flagLimit),
+
+			fzf.WithHotReload(mu.RLocker()),
 
 			fzf.WithPrompt(flagPrompt),
 			fzf.WithCursor(flagCursor),
@@ -187,14 +155,83 @@ var rootCmd = &cobra.Command{
 				}),
 			),
 		)
-		choices, err := f.Find(items, func(i int) string { return items[i] })
+
+		ctx := context.Background()
+		g, ctx := errgroup.WithContext(ctx)
+
+		info, err := os.Stdin.Stat()
 		if err != nil {
 			return err
 		}
 
-		for _, choice := range choices {
-			fmt.Println(items[choice])
+		if info.Mode()&os.ModeCharDevice == 0 {
+			g.Go(func() error {
+				sc := bufio.NewScanner(os.Stdin)
+				for sc.Scan() {
+					mu.Lock()
+					items = append(items, sc.Text())
+					mu.Unlock()
+				}
+				return nil
+			})
+		} else {
+			wd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+
+			g.Go(func() error {
+				err := filepath.WalkDir(wd, func(path string, d fs.DirEntry, err error) error {
+					select {
+					case <-ctx.Done():
+						return ctx.Err()
+					default:
+					}
+
+					if err != nil {
+						return err
+					}
+
+					if d.Name()[0] == '.' {
+						if d.IsDir() {
+							return fs.SkipDir
+						}
+						return nil
+					}
+
+					if !d.IsDir() {
+						mu.Lock()
+						items = append(items, path)
+						mu.Unlock()
+					}
+
+					return nil
+				})
+				if err != nil {
+					f.Quit()
+					return err
+				}
+				return nil
+			})
 		}
+
+		g.Go(func() error {
+			choices, err := f.Find(&items, func(i int) string { return items[i] })
+			if err != nil {
+				return err
+			}
+
+			for _, choice := range choices {
+				fmt.Println(items[choice])
+			}
+
+			return nil
+		})
+
+		if err := g.Wait(); err != nil {
+			return err
+		}
+
 		return nil
 	},
 }

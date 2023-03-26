@@ -209,9 +209,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) choice() {
-	if len(m.choices) == 0 && m.cursorPosition >= 0 {
-		m.choices = append(m.choices, m.matches[m.cursorPosition].Index)
+	if len(m.choices) > 0 {
+		return
 	}
+
+	if m.matches.Len() == 0 {
+		return
+	}
+
+	m.choices = append(m.choices, m.matches[m.cursorPosition].Index)
 }
 
 func (m *model) toggle() {

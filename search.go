@@ -6,15 +6,20 @@ import (
 	"sync"
 )
 
-type match struct {
+type Items interface {
+	String(i int) string
+	Len() int
+}
+
+type Match struct {
 	Str            string
 	Index          int
 	MatchedIndexes []int
 }
 
-type matches []match
+type Matches []Match
 
-func (m matches) Sort() {
+func (m Matches) Sort() {
 	sort.Slice(m, func(i, j int) bool {
 		mi, mj := m[i].MatchedIndexes, m[j].MatchedIndexes
 		li, lj := len(mi), len(mj)
@@ -33,12 +38,12 @@ func (m matches) Sort() {
 	})
 }
 
-func fuzzySearch(items *items, search string, caseSensitive bool) matches {
+func Search(items Items, search string, caseSensitive bool) Matches {
 	if !caseSensitive {
 		search = strings.ToLower(search)
 	}
 
-	result := make(matches, 0, items.Len())
+	result := make(Matches, 0, items.Len())
 	resultMutex := sync.Mutex{}
 	wg := sync.WaitGroup{}
 
@@ -57,7 +62,7 @@ func fuzzySearch(items *items, search string, caseSensitive bool) matches {
 					end = items.Len()
 				}
 
-				localMatches := make(matches, 0)
+				localMatches := make(Matches, 0)
 
 				for index := start; index < end; index++ {
 					item := items.String(index)
@@ -77,7 +82,7 @@ func fuzzySearch(items *items, search string, caseSensitive bool) matches {
 					}
 
 					if j == len(search) {
-						m := match{Str: items.String(index), Index: index, MatchedIndexes: matchedIndexes}
+						m := Match{Str: items.String(index), Index: index, MatchedIndexes: matchedIndexes}
 						localMatches = append(localMatches, m)
 					}
 				}

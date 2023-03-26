@@ -36,7 +36,7 @@ type model struct {
 	cursorLineStyle        lipgloss.Style
 	cursorLineMatchesStyle lipgloss.Style
 
-	matches matches
+	matches Matches
 	choices []int
 
 	// window
@@ -318,9 +318,9 @@ func (m *model) cursorDown() {
 func (m *model) filter() {
 	s := m.input.Value()
 	if s == "" {
-		var matches matches
+		var matches Matches
 		for i := 0; i < m.items.Len(); i++ {
-			matches = append(matches, match{
+			matches = append(matches, Match{
 				Str:   m.items.String(i),
 				Index: i,
 			})
@@ -329,7 +329,7 @@ func (m *model) filter() {
 		return
 	}
 
-	m.matches = fuzzySearch(m.items, s, m.option.caseSensitive)
+	m.matches = Search(m.items, s, m.option.caseSensitive)
 }
 
 func (m *model) fixCursor() {

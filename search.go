@@ -16,20 +16,25 @@ type searchOption struct {
 	caseSensitive bool
 }
 
+// Items represents a list of items to be searched.
 type Items interface {
+	// String returns the string of the i-th item.
 	String(i int) string
+	// Len returns the length of items.
 	Len() int
 }
 
+// Match represents a matched string.
 type Match struct {
 	Str            string
 	Index          int
 	MatchedIndexes []int
 }
 
+// Matches is a slice of Match.
 type Matches []Match
 
-func (m Matches) Sort() {
+func (m Matches) sort() {
 	sort.Slice(m, func(i, j int) bool {
 		mi, mj := m[i].MatchedIndexes, m[j].MatchedIndexes
 		li, lj := len(mi), len(mj)
@@ -48,6 +53,7 @@ func (m Matches) Sort() {
 	})
 }
 
+// SearchOption represents a option for a search.
 type SearchOption func(o *searchOption)
 
 func WithSearchCaseSensitive(c bool) SearchOption {
@@ -56,6 +62,7 @@ func WithSearchCaseSensitive(c bool) SearchOption {
 	}
 }
 
+// Search performs a fuzzy search for items.
 func Search(items Items, search string, opts ...SearchOption) Matches {
 	o := defaultSearchOption
 	for _, opt := range opts {
@@ -123,6 +130,6 @@ func Search(items Items, search string, opts ...SearchOption) Matches {
 	close(chunks)
 	wg.Wait()
 
-	result.Sort()
+	result.sort()
 	return result
 }

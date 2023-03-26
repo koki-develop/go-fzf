@@ -55,6 +55,10 @@ type option struct {
 	countViewFunc    func(itemsCount, matchesCount, windowWidth int) string
 }
 
+func (o *option) multiple() bool {
+	return o.noLimit || o.limit > 1
+}
+
 // Option represents a option for the Fuzzy Finder.
 type Option func(o *option)
 

@@ -191,6 +191,13 @@ var rootCmd = &cobra.Command{
 					}
 
 					if err != nil {
+						if os.IsPermission(err) {
+							if d.IsDir() {
+								return fs.SkipDir
+							} else {
+								return nil
+							}
+						}
 						return err
 					}
 

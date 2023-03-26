@@ -180,7 +180,7 @@ func (m *model) itemsView() string {
 			}
 		}
 
-		if i+1 == m.windowHeight-headerHeight {
+		if i+1 >= m.windowHeight-headerHeight {
 			break
 		}
 		v.WriteString("\n")

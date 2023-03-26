@@ -21,8 +21,9 @@ var (
 )
 
 var (
-	flagLimit   int
-	flagNoLimit bool
+	flagLimit         int
+	flagNoLimit       bool
+	flagCaseSensitive bool
 
 	flagPrompt           string
 	flagCursor           string
@@ -125,6 +126,7 @@ var rootCmd = &cobra.Command{
 		f := fzf.New(
 			fzf.WithNoLimit(flagNoLimit),
 			fzf.WithLimit(flagLimit),
+			fzf.WithCaseSensitive(flagCaseSensitive),
 
 			fzf.WithPrompt(flagPrompt),
 			fzf.WithCursor(flagCursor),
@@ -221,6 +223,8 @@ func init() {
 	rootCmd.Flags().IntVar(&flagLimit, "limit", 1, "maximum number of items to select")
 	rootCmd.Flags().BoolVar(&flagNoLimit, "no-limit", false, "unlimited number of items to select")
 	rootCmd.MarkFlagsMutuallyExclusive("limit", "no-limit")
+
+	rootCmd.Flags().BoolVar(&flagCaseSensitive, "case-sensitive", false, "case sensitive search")
 
 	rootCmd.Flags().StringVar(&flagPrompt, "prompt", "> ", "")
 	rootCmd.Flags().StringVar(&flagCursor, "cursor", "> ", "")

@@ -15,8 +15,9 @@ var (
 )
 
 type model struct {
-	fzf   *FZF
-	items *items
+	fzf        *FZF
+	items      *items
+	findOption *findOption
 
 	// state
 	abort bool
@@ -46,7 +47,7 @@ type model struct {
 	input textinput.Model
 }
 
-func newModel(fzf *FZF, items *items) *model {
+func newModel(fzf *FZF, items *items, opt *findOption) *model {
 	input := textinput.New()
 	input.Prompt = fzf.option.prompt
 	input.Placeholder = fzf.option.inputPlaceholder
@@ -57,8 +58,9 @@ func newModel(fzf *FZF, items *items) *model {
 	}
 
 	return &model{
-		fzf:   fzf,
-		items: items,
+		fzf:        fzf,
+		items:      items,
+		findOption: opt,
 		// state
 		abort: false,
 
@@ -150,8 +152,8 @@ func (m *model) itemsView() string {
 		}
 
 		// write item prefix
-		if m.items.HasItemPrefixFunc() {
-			_, _ = v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
+		if m.findOption.itemPrefixFunc != nil {
+			_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
 		}
 
 		// write item

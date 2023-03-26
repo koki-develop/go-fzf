@@ -30,9 +30,9 @@ func New(opts ...Option) *FZF {
 
 // Find launches the Fuzzy Finder and returns a list of indexes of the selected items.
 func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...FindOption) ([]int, error) {
-	o := defaultFindOption
+	findOption := defaultFindOption
 	for _, opt := range opts {
-		opt(&o)
+		opt(&findOption)
 	}
 
 	rv := reflect.ValueOf(items)
@@ -43,11 +43,11 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 		return nil, fmt.Errorf("items must be a slice, but got %T", items)
 	}
 
-	is, err := newItems(rv, itemFunc, o.itemPrefixFunc)
+	is, err := newItems(rv, itemFunc)
 	if err != nil {
 		return nil, err
 	}
-	m := newModel(fzf, is)
+	m := newModel(fzf, is, &findOption)
 
 	p := tea.NewProgram(m)
 	if _, err := p.Run(); err != nil {

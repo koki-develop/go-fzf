@@ -2,6 +2,7 @@ package fzf
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -13,10 +14,6 @@ import (
 
 var (
 	_ tea.Model = (*model)(nil)
-)
-
-const (
-	headerHeight = 1
 )
 
 type model struct {
@@ -103,14 +100,35 @@ func (m *model) View() string {
 }
 
 func (m *model) headerView() string {
-	return m.input.View()
+	var v strings.Builder
+
+	// input
+	_, _ = v.WriteString(m.input.View())
+	_, _ = v.WriteRune('\n')
+
+	// count
+	var cv strings.Builder
+	_, _ = cv.WriteString(strconv.Itoa(m.matches.Len()))
+	_, _ = cv.WriteRune('/')
+	_, _ = cv.WriteString(strconv.Itoa(m.items.Len()))
+	_, _ = cv.WriteRune(' ')
+	_, _ = v.WriteString(cv.String())
+	_, _ = v.WriteString(strings.Repeat("─", max(m.windowWidth-cv.Len(), 0)))
+
+	return v.String()
+}
+
+func (m *model) headerHeight() int {
+	return lipgloss.Height(m.headerView())
 }
 
 func (m *model) itemsView() string {
 	var v strings.Builder
 
+	headerHeight := m.headerHeight()
+
 	for i, match := range m.matches[m.windowYPosition:] {
-		cursorLine := m.cursorPosition == i
+		cursorLine := m.cursorPosition == i+m.windowYPosition
 
 		// write cursor
 		if cursorLine {
@@ -207,9 +225,15 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m *model) choice() {
-	if len(m.choices) == 0 && m.cursorPosition >= 0 {
-		m.choices = append(m.choices, m.matches[m.cursorPosition].Index)
+	if len(m.choices) > 0 {
+		return
 	}
+
+	if m.matches.Len() == 0 {
+		return
+	}
+
+	m.choices = append(m.choices, m.matches[m.cursorPosition].Index)
 }
 
 func (m *model) toggle() {
@@ -258,7 +282,7 @@ func (m *model) filter() {
 }
 
 func (m *model) fixCursor() {
-	if m.cursorPosition < 0 && len(m.matches) > 0 {
+	if m.cursorPosition < 0 {
 		m.cursorPosition = 0
 		return
 	}
@@ -270,6 +294,8 @@ func (m *model) fixCursor() {
 }
 
 func (m *model) fixYPosition() {
+	headerHeight := m.headerHeight()
+
 	if m.windowHeight-headerHeight > len(m.matches) {
 		m.windowYPosition = 0
 		return

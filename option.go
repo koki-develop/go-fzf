@@ -9,8 +9,9 @@ import (
 )
 
 var defaultOption = option{
-	limit:   1,
-	noLimit: false,
+	limit:         1,
+	noLimit:       false,
+	caseSensitive: false,
 
 	prompt:           "> ",
 	cursor:           "> ",
@@ -42,8 +43,9 @@ var defaultOption = option{
 }
 
 type option struct {
-	limit   int
-	noLimit bool
+	limit         int
+	noLimit       bool
+	caseSensitive bool
 
 	prompt           string
 	cursor           string
@@ -162,5 +164,12 @@ func WithCountView(f func(itemsCount, matchesCount, windowWidth int) string) Opt
 func WithHotReload(locker sync.Locker) Option {
 	return func(o *option) {
 		o.hotReloadLocker = locker
+	}
+}
+
+// WithCaseSensitive sets the case sensitivity.
+func WithCaseSensitive(s bool) Option {
+	return func(o *option) {
+		o.caseSensitive = s
 	}
 }

@@ -307,7 +307,7 @@ func (m *model) fixCursor() {
 	}
 
 	if m.cursorPosition+1 > len(m.matches) {
-		m.cursorPosition = len(m.matches) - 1
+		m.cursorPosition = max(len(m.matches)-1, 0)
 		return
 	}
 }
@@ -326,7 +326,7 @@ func (m *model) fixYPosition() {
 	}
 
 	if m.cursorPosition+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
-		m.windowYPosition = m.cursorPosition + 1 - (m.windowHeight - headerHeight)
+		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-headerHeight), 0)
 		return
 	}
 }

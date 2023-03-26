@@ -15,10 +15,6 @@ var (
 	_ tea.Model = (*model)(nil)
 )
 
-const (
-	headerHeight = 1
-)
-
 type model struct {
 	fzf   *FZF
 	items *items
@@ -106,8 +102,14 @@ func (m *model) headerView() string {
 	return m.input.View()
 }
 
+func (m *model) headerHeight() int {
+	return lipgloss.Height(m.headerView())
+}
+
 func (m *model) itemsView() string {
 	var v strings.Builder
+
+	headerHeight := m.headerHeight()
 
 	for i, match := range m.matches[m.windowYPosition:] {
 		cursorLine := m.cursorPosition == i
@@ -270,6 +272,8 @@ func (m *model) fixCursor() {
 }
 
 func (m *model) fixYPosition() {
+	headerHeight := m.headerHeight()
+
 	if m.windowHeight-headerHeight > len(m.matches) {
 		m.windowYPosition = 0
 		return

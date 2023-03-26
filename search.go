@@ -2,6 +2,7 @@ package fzf
 
 import (
 	"sort"
+	"strings"
 	"sync"
 )
 
@@ -32,7 +33,11 @@ func (m matches) Sort() {
 	})
 }
 
-func fuzzySearch(items *items, search string) matches {
+func fuzzySearch(items *items, search string, caseSensitive bool) matches {
+	if !caseSensitive {
+		search = strings.ToLower(search)
+	}
+
 	result := make(matches, 0, items.Len())
 	resultMutex := sync.Mutex{}
 	wg := sync.WaitGroup{}
@@ -56,6 +61,11 @@ func fuzzySearch(items *items, search string) matches {
 
 				for index := start; index < end; index++ {
 					item := items.String(index)
+
+					if !caseSensitive {
+						item = strings.ToLower(item)
+					}
+
 					matchedIndexes := make([]int, 0, len(search))
 					j := 0
 
@@ -67,7 +77,7 @@ func fuzzySearch(items *items, search string) matches {
 					}
 
 					if j == len(search) {
-						m := match{Str: item, Index: index, MatchedIndexes: matchedIndexes}
+						m := match{Str: items.String(index), Index: index, MatchedIndexes: matchedIndexes}
 						localMatches = append(localMatches, m)
 					}
 				}

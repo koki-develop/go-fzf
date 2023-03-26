@@ -1,7 +1,6 @@
 package fzf
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -25,6 +24,8 @@ type model struct {
 	cursor         string
 	nocursor       string
 	cursorPosition int
+
+	promptWidth int
 
 	selectedPrefix   string
 	unselectedPrefix string
@@ -65,6 +66,8 @@ func newModel(fzf *FZF, items *items) *model {
 		nocursor:       strings.Repeat(" ", lipgloss.Width(fzf.option.cursor)),
 		cursorPosition: 0,
 
+		promptWidth: lipgloss.Width(fzf.option.prompt),
+
 		selectedPrefix:   fzf.option.styles.option.selectedPrefix.Render(fzf.option.selectedPrefix),
 		unselectedPrefix: fzf.option.styles.option.unselectedPrefix.Render(fzf.option.unselectedPrefix),
 
@@ -95,7 +98,13 @@ func (m *model) Init() tea.Cmd {
  */
 
 func (m *model) View() string {
-	return fmt.Sprintf("%s\n%s", m.headerView(), m.itemsView())
+	var v strings.Builder
+
+	_, _ = v.WriteString(m.headerView())
+	_, _ = v.WriteRune('\n')
+	_, _ = v.WriteString(m.itemsView())
+
+	return v.String()
 }
 
 func (m *model) headerView() string {
@@ -201,7 +210,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// window
 		m.windowWidth = msg.Width
 		m.windowHeight = msg.Height
-		m.input.Width = m.windowWidth - 3
+		m.input.Width = m.windowWidth - m.promptWidth
 	}
 
 	var cmds []tea.Cmd

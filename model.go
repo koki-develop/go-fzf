@@ -266,7 +266,7 @@ func (m *model) filter() {
 }
 
 func (m *model) fixCursor() {
-	if m.cursorPosition < 0 && len(m.matches) > 0 {
+	if m.cursorPosition < 0 {
 		m.cursorPosition = 0
 		return
 	}

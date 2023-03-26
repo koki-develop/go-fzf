@@ -1,6 +1,7 @@
 package fzf
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -66,6 +67,17 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 	}
 
 	return fzf.model.choices, nil
+}
+
+// ForceReload forces the reload of items.
+// HotReload must be enabled.
+func (fzf *FZF) ForceReload() error {
+	if fzf.model.option.hotReloadLocker == nil {
+		return errors.New("hot reload is not enabled")
+	}
+
+	fzf.program.Send(forceReloadMsg{})
+	return nil
 }
 
 // Quit quits the Fuzzy Finder.

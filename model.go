@@ -209,6 +209,7 @@ func (m *model) itemsView() string {
  */
 
 type watchReloadMsg struct{}
+type forceReloadMsg struct{}
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
@@ -245,7 +246,12 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.fixYPosition()
 		m.fixCursor()
 	case watchReloadMsg:
+		// watch reload
 		return m, m.watchReload()
+	case forceReloadMsg:
+		// force reload
+		m.forceReload()
+		return m, nil
 	}
 
 	var cmds []tea.Cmd
@@ -349,6 +355,12 @@ func (m *model) fixYPosition() {
 		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-headerHeight), 0)
 		return
 	}
+}
+
+func (m *model) forceReload() {
+	m.option.hotReloadLocker.Lock()
+	defer m.option.hotReloadLocker.Unlock()
+	m.setItems(m.items)
 }
 
 func (m *model) watchReload() tea.Cmd {

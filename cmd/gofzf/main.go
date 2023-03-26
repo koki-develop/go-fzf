@@ -3,7 +3,9 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"io/fs"
 	"os"
+	"path/filepath"
 	"runtime/debug"
 
 	"github.com/koki-develop/go-fzf"
@@ -78,11 +80,44 @@ var rootCmd = &cobra.Command{
 	Use:          "gofzf",
 	SilenceUsage: true,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		sc := bufio.NewScanner(os.Stdin)
-
 		var items []string
-		for sc.Scan() {
-			items = append(items, sc.Text())
+
+		info, err := os.Stdin.Stat()
+		if err != nil {
+			return err
+		}
+
+		if info.Mode()&os.ModeCharDevice == 0 {
+			sc := bufio.NewScanner(os.Stdin)
+			for sc.Scan() {
+				items = append(items, sc.Text())
+			}
+		} else {
+			wd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			err = filepath.WalkDir(wd, func(path string, d fs.DirEntry, err error) error {
+				if err != nil {
+					return err
+				}
+
+				if d.Name()[0] == '.' {
+					if d.IsDir() {
+						return fs.SkipDir
+					}
+					return nil
+				}
+
+				if !d.IsDir() {
+					items = append(items, path)
+				}
+
+				return nil
+			})
+			if err != nil {
+				return err
+			}
 		}
 
 		f := fzf.New(

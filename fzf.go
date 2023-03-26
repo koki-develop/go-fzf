@@ -67,6 +67,11 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 	return fzf.model.choices, nil
 }
 
+// Quit quits the Fuzzy Finder.
+func (fzf *FZF) Quit() {
+	fzf.program.Quit()
+}
+
 // Option represents a option for the Find.
 type FindOption func(o *findOption)
 

@@ -3,6 +3,7 @@ package fzf
 import (
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/charmbracelet/bubbles/key"
 )
@@ -36,6 +37,8 @@ var defaultOption = option{
 		_, _ = v.WriteString(strings.Repeat("─", max(windowWidth-v.Len(), 0)))
 		return v.String()
 	},
+
+	hotReloadLocker: nil,
 }
 
 type option struct {
@@ -53,6 +56,8 @@ type option struct {
 
 	countViewEnabled bool
 	countViewFunc    func(itemsCount, matchesCount, windowWidth int) string
+
+	hotReloadLocker sync.Locker
 }
 
 func (o *option) multiple() bool {
@@ -150,5 +155,12 @@ func WithCountViewEnabled(b bool) Option {
 func WithCountView(f func(itemsCount, matchesCount, windowWidth int) string) Option {
 	return func(o *option) {
 		o.countViewFunc = f
+	}
+}
+
+// WithHotReload sets the locker for read items.
+func WithHotReload(locker sync.Locker) Option {
+	return func(o *option) {
+		o.hotReloadLocker = locker
 	}
 }

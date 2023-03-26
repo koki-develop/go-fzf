@@ -2,6 +2,7 @@ package fzf
 
 import (
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -15,6 +16,7 @@ var (
 
 type model struct {
 	items      *items
+	itemsLen   int
 	option     *option
 	findOption *findOption
 
@@ -84,17 +86,10 @@ func newModel(opt *option) *model {
 	}
 }
 
-func (m *model) setItems(items *items) {
-	var matches matches
-	for i := 0; i < items.Len(); i++ {
-		matches = append(matches, match{
-			Str:   items.String(i),
-			Index: i,
-		})
-	}
-
+func (m *model) loadItems(items *items) {
 	m.items = items
-	m.matches = matches
+	m.itemsLen = items.Len()
+	m.filter()
 }
 
 func (m *model) setFindOption(findOption *findOption) {
@@ -102,9 +97,16 @@ func (m *model) setFindOption(findOption *findOption) {
 }
 
 func (m *model) Init() tea.Cmd {
-	return tea.Batch(
+	cmds := []tea.Cmd{
 		textinput.Blink,
 		tea.EnterAltScreen,
+	}
+	if m.option.hotReloadLocker != nil {
+		cmds = append(cmds, m.watchReload())
+	}
+
+	return tea.Batch(
+		cmds...,
 	)
 }
 
@@ -113,6 +115,11 @@ func (m *model) Init() tea.Cmd {
  */
 
 func (m *model) View() string {
+	if m.option.hotReloadLocker != nil {
+		m.option.hotReloadLocker.Lock()
+		defer m.option.hotReloadLocker.Unlock()
+	}
+
 	var v strings.Builder
 
 	_, _ = v.WriteString(m.headerView())
@@ -145,8 +152,12 @@ func (m *model) itemsView() string {
 
 	headerHeight := m.headerHeight()
 
-	for i, match := range m.matches[m.windowYPosition:] {
-		cursorLine := m.cursorPosition == i+m.windowYPosition
+	for i, match := range m.matches {
+		if i < m.windowYPosition {
+			continue
+		}
+
+		cursorLine := m.cursorPosition == i
 
 		// write cursor
 		if cursorLine {
@@ -185,7 +196,7 @@ func (m *model) itemsView() string {
 			}
 		}
 
-		if i+1 >= m.windowHeight-headerHeight {
+		if i+1-m.windowYPosition >= m.windowHeight-headerHeight {
 			break
 		}
 		v.WriteString("\n")
@@ -198,7 +209,15 @@ func (m *model) itemsView() string {
  * update
  */
 
+type watchReloadMsg struct{}
+type forceReloadMsg struct{}
+
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.option.hotReloadLocker != nil {
+		m.option.hotReloadLocker.Lock()
+		defer m.option.hotReloadLocker.Unlock()
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// key
@@ -232,6 +251,13 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.input.Width = m.windowWidth - m.promptWidth
 		m.fixYPosition()
 		m.fixCursor()
+	case watchReloadMsg:
+		// watch reload
+		return m, m.watchReload()
+	case forceReloadMsg:
+		// force reload
+		m.forceReload()
+		return m, nil
 	}
 
 	var cmds []tea.Cmd
@@ -335,4 +361,18 @@ func (m *model) fixYPosition() {
 		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-headerHeight), 0)
 		return
 	}
+}
+
+func (m *model) forceReload() {
+	m.loadItems(m.items)
+}
+
+func (m *model) watchReload() tea.Cmd {
+	return tea.Tick(30*time.Millisecond, func(_ time.Time) tea.Msg {
+		if m.itemsLen != m.items.Len() {
+			m.loadItems(m.items)
+		}
+
+		return watchReloadMsg{}
+	})
 }

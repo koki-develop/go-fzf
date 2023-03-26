@@ -112,7 +112,7 @@ func (m *model) itemsView() string {
 	headerHeight := m.headerHeight()
 
 	for i, match := range m.matches[m.windowYPosition:] {
-		cursorLine := m.cursorPosition == i
+		cursorLine := m.cursorPosition == i+m.windowYPosition
 
 		// write cursor
 		if cursorLine {

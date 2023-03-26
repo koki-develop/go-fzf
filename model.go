@@ -87,17 +87,9 @@ func newModel(opt *option) *model {
 }
 
 func (m *model) loadItems(items *items) {
-	var matches matches
-	for i := 0; i < items.Len(); i++ {
-		matches = append(matches, match{
-			Str:   items.String(i),
-			Index: i,
-		})
-	}
-
 	m.items = items
 	m.itemsLen = items.Len()
-	m.matches = matches
+	m.filter()
 }
 
 func (m *model) setFindOption(findOption *findOption) {

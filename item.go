@@ -16,7 +16,7 @@ func newItems(rv reflect.Value, itemFunc func(i int) string) (*items, error) {
 	}, nil
 }
 
-func (is items) String(i int) string {
+func (is items) ItemString(i int) string {
 	return stringLinesToSpace(is.itemFunc(i))
 }
 

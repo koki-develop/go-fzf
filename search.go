@@ -18,8 +18,8 @@ type searchOption struct {
 
 // Items represents a list of items to be searched.
 type Items interface {
-	// String returns the string of the i-th item.
-	String(i int) string
+	// ItemString returns the string of the i-th item.
+	ItemString(i int) string
 	// Len returns the length of items.
 	Len() int
 }
@@ -95,7 +95,7 @@ func Search(items Items, search string, opts ...SearchOption) Matches {
 				localMatches := make(Matches, 0)
 
 				for index := start; index < end; index++ {
-					item := items.String(index)
+					item := items.ItemString(index)
 
 					if !o.caseSensitive {
 						item = strings.ToLower(item)
@@ -112,7 +112,7 @@ func Search(items Items, search string, opts ...SearchOption) Matches {
 					}
 
 					if j == len(search) {
-						m := Match{Str: items.String(index), Index: index, MatchedIndexes: matchedIndexes}
+						m := Match{Str: items.ItemString(index), Index: index, MatchedIndexes: matchedIndexes}
 						localMatches = append(localMatches, m)
 					}
 				}

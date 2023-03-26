@@ -321,7 +321,7 @@ func (m *model) filter() {
 		var matches Matches
 		for i := 0; i < m.items.Len(); i++ {
 			matches = append(matches, Match{
-				Str:   m.items.String(i),
+				Str:   m.items.ItemString(i),
 				Index: i,
 			})
 		}

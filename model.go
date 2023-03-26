@@ -225,6 +225,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.windowWidth = msg.Width
 		m.windowHeight = msg.Height
 		m.input.Width = m.windowWidth - m.promptWidth
+		m.fixYPosition()
+		m.fixCursor()
 	}
 
 	var cmds []tea.Cmd

@@ -15,8 +15,9 @@ var (
 )
 
 type model struct {
-	fzf   *FZF
-	items *items
+	fzf        *FZF
+	items      *items
+	findOption *findOption
 
 	// state
 	abort bool
@@ -46,7 +47,7 @@ type model struct {
 	input textinput.Model
 }
 
-func newModel(fzf *FZF, items *items) *model {
+func newModel(fzf *FZF, items *items, opt *findOption) *model {
 	input := textinput.New()
 	input.Prompt = fzf.option.prompt
 	input.Placeholder = fzf.option.inputPlaceholder
@@ -56,9 +57,18 @@ func newModel(fzf *FZF, items *items) *model {
 		fzf.option.keymap.Toggle.SetEnabled(false)
 	}
 
+	var matches fuzzy.Matches
+	for i := 0; i < items.Len(); i++ {
+		matches = append(matches, fuzzy.Match{
+			Str:   items.String(i),
+			Index: i,
+		})
+	}
+
 	return &model{
-		fzf:   fzf,
-		items: items,
+		fzf:        fzf,
+		items:      items,
+		findOption: opt,
 		// state
 		abort: false,
 
@@ -75,7 +85,7 @@ func newModel(fzf *FZF, items *items) *model {
 		cursorLineStyle:        fzf.option.styles.option.cursorLine,
 		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(fzf.option.styles.option.matches).Inherit(fzf.option.styles.option.cursorLine),
 
-		matches: fuzzy.Matches{},
+		matches: matches,
 		choices: []int{},
 		// window
 		windowWidth:     0,
@@ -150,8 +160,8 @@ func (m *model) itemsView() string {
 		}
 
 		// write item prefix
-		if m.items.HasItemPrefixFunc() {
-			_, _ = v.WriteString(stringLinesToSpace(m.items.itemPrefixFunc(match.Index)))
+		if m.findOption.itemPrefixFunc != nil {
+			_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
 		}
 
 		// write item
@@ -170,7 +180,7 @@ func (m *model) itemsView() string {
 			}
 		}
 
-		if i+1 == m.windowHeight-headerHeight {
+		if i+1 >= m.windowHeight-headerHeight {
 			break
 		}
 		v.WriteString("\n")
@@ -202,27 +212,35 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.fzf.option.keymap.Up):
 			// up
 			m.cursorUp()
+			m.fixYPosition()
+			m.fixCursor()
 		case key.Matches(msg, m.fzf.option.keymap.Down):
 			// down
 			m.cursorDown()
+			m.fixYPosition()
+			m.fixCursor()
 		}
 	case tea.WindowSizeMsg:
 		// window
 		m.windowWidth = msg.Width
 		m.windowHeight = msg.Height
 		m.input.Width = m.windowWidth - m.promptWidth
+		m.fixYPosition()
+		m.fixCursor()
 	}
 
 	var cmds []tea.Cmd
+	beforeValue := m.input.Value()
 	{
 		input, cmd := m.input.Update(msg)
 		m.input = input
 		cmds = append(cmds, cmd)
 	}
-
-	m.filter()
-	m.fixYPosition()
-	m.fixCursor()
+	if beforeValue != m.input.Value() {
+		m.filter()
+		m.fixYPosition()
+		m.fixCursor()
+	}
 
 	return m, tea.Batch(cmds...)
 }
@@ -267,10 +285,9 @@ func (m *model) cursorDown() {
 }
 
 func (m *model) filter() {
-	var matches fuzzy.Matches
-
 	s := m.input.Value()
 	if s == "" {
+		var matches fuzzy.Matches
 		for i := 0; i < m.items.Len(); i++ {
 			matches = append(matches, fuzzy.Match{
 				Str:   m.items.String(i),

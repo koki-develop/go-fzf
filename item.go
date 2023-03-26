@@ -5,16 +5,14 @@ import (
 )
 
 type items struct {
-	items          reflect.Value
-	itemFunc       func(i int) string
-	itemPrefixFunc func(i int) string
+	items    reflect.Value
+	itemFunc func(i int) string
 }
 
-func newItems(rv reflect.Value, itemFunc func(i int) string, itemPrefixFunc func(i int) string) (*items, error) {
+func newItems(rv reflect.Value, itemFunc func(i int) string) (*items, error) {
 	return &items{
-		items:          rv,
-		itemFunc:       itemFunc,
-		itemPrefixFunc: itemPrefixFunc,
+		items:    rv,
+		itemFunc: itemFunc,
 	}, nil
 }
 
@@ -28,8 +26,4 @@ func (is items) Len() int {
 	} else {
 		return is.items.Len()
 	}
-}
-
-func (is items) HasItemPrefixFunc() bool {
-	return is.itemPrefixFunc != nil
 }

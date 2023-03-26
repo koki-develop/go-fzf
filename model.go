@@ -14,8 +14,8 @@ var (
 )
 
 type model struct {
-	fzf        *FZF
 	items      *items
+	option     *option
 	findOption *findOption
 
 	// state
@@ -46,45 +46,34 @@ type model struct {
 	input textinput.Model
 }
 
-func newModel(fzf *FZF, items *items, opt *findOption) *model {
+func newModel(opt *option) *model {
 	input := textinput.New()
-	input.Prompt = fzf.option.prompt
-	input.Placeholder = fzf.option.inputPlaceholder
+	input.Prompt = opt.prompt
+	input.Placeholder = opt.inputPlaceholder
 	input.Focus()
 
-	if !fzf.multiple() {
-		fzf.option.keymap.Toggle.SetEnabled(false)
-	}
-
-	var matches matches
-	for i := 0; i < items.Len(); i++ {
-		matches = append(matches, match{
-			Str:   items.String(i),
-			Index: i,
-		})
+	if !opt.multiple() {
+		opt.keymap.Toggle.SetEnabled(false)
 	}
 
 	return &model{
-		fzf:        fzf,
-		items:      items,
-		findOption: opt,
+		option: opt,
 		// state
 		abort: false,
 
-		cursor:         fzf.option.styles.option.cursor.Render(fzf.option.cursor),
-		nocursor:       strings.Repeat(" ", lipgloss.Width(fzf.option.cursor)),
+		cursor:         opt.styles.option.cursor.Render(opt.cursor),
+		nocursor:       strings.Repeat(" ", lipgloss.Width(opt.cursor)),
 		cursorPosition: 0,
 
-		promptWidth: lipgloss.Width(fzf.option.prompt),
+		promptWidth: lipgloss.Width(opt.prompt),
 
-		selectedPrefix:   fzf.option.styles.option.selectedPrefix.Render(fzf.option.selectedPrefix),
-		unselectedPrefix: fzf.option.styles.option.unselectedPrefix.Render(fzf.option.unselectedPrefix),
+		selectedPrefix:   opt.styles.option.selectedPrefix.Render(opt.selectedPrefix),
+		unselectedPrefix: opt.styles.option.unselectedPrefix.Render(opt.unselectedPrefix),
 
-		matchesStyle:           fzf.option.styles.option.matches,
-		cursorLineStyle:        fzf.option.styles.option.cursorLine,
-		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(fzf.option.styles.option.matches).Inherit(fzf.option.styles.option.cursorLine),
+		matchesStyle:           opt.styles.option.matches,
+		cursorLineStyle:        opt.styles.option.cursorLine,
+		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(opt.styles.option.matches).Inherit(opt.styles.option.cursorLine),
 
-		matches: matches,
 		choices: []int{},
 		// window
 		windowWidth:     0,
@@ -93,6 +82,23 @@ func newModel(fzf *FZF, items *items, opt *findOption) *model {
 		// components
 		input: input,
 	}
+}
+
+func (m *model) setItems(items *items) {
+	var matches matches
+	for i := 0; i < items.Len(); i++ {
+		matches = append(matches, match{
+			Str:   items.String(i),
+			Index: i,
+		})
+	}
+
+	m.items = items
+	m.matches = matches
+}
+
+func (m *model) setFindOption(findOption *findOption) {
+	m.findOption = findOption
 }
 
 func (m *model) Init() tea.Cmd {
@@ -122,9 +128,9 @@ func (m *model) headerView() string {
 	// input
 	_, _ = v.WriteString(m.input.View())
 	// count
-	if m.fzf.option.countViewEnabled {
+	if m.option.countViewEnabled {
 		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.fzf.option.countViewFunc(m.items.Len(), len(m.matches), m.windowWidth))
+		_, _ = v.WriteString(m.option.countViewFunc(m.items.Len(), len(m.matches), m.windowWidth))
 	}
 
 	return v.String()
@@ -150,7 +156,7 @@ func (m *model) itemsView() string {
 		}
 
 		// write toggle
-		if m.fzf.multiple() {
+		if m.option.multiple() {
 			if intContains(m.choices, match.Index) {
 				_, _ = v.WriteString(m.selectedPrefix)
 			} else {
@@ -197,23 +203,23 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		// key
 		switch {
-		case key.Matches(msg, m.fzf.option.keymap.Abort):
+		case key.Matches(msg, m.option.keymap.Abort):
 			// abort
 			m.abort = true
 			return m, tea.Quit
-		case key.Matches(msg, m.fzf.option.keymap.Choose):
+		case key.Matches(msg, m.option.keymap.Choose):
 			// choose
 			m.choice()
 			return m, tea.Quit
-		case key.Matches(msg, m.fzf.option.keymap.Toggle):
+		case key.Matches(msg, m.option.keymap.Toggle):
 			// toggle
 			m.toggle()
-		case key.Matches(msg, m.fzf.option.keymap.Up):
+		case key.Matches(msg, m.option.keymap.Up):
 			// up
 			m.cursorUp()
 			m.fixYPosition()
 			m.fixCursor()
-		case key.Matches(msg, m.fzf.option.keymap.Down):
+		case key.Matches(msg, m.option.keymap.Down):
 			// down
 			m.cursorDown()
 			m.fixYPosition()
@@ -265,7 +271,7 @@ func (m *model) toggle() {
 	if intContains(m.choices, match.Index) {
 		m.choices = intFilter(m.choices, func(i int) bool { return i != match.Index })
 	} else {
-		if m.fzf.option.noLimit || len(m.choices) < m.fzf.option.limit {
+		if m.option.noLimit || len(m.choices) < m.option.limit {
 			m.choices = append(m.choices, match.Index)
 		}
 	}

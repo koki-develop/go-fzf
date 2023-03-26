@@ -2,7 +2,6 @@ package fzf
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -104,16 +103,11 @@ func (m *model) headerView() string {
 
 	// input
 	_, _ = v.WriteString(m.input.View())
-	_, _ = v.WriteRune('\n')
-
 	// count
-	var cv strings.Builder
-	_, _ = cv.WriteString(strconv.Itoa(m.matches.Len()))
-	_, _ = cv.WriteRune('/')
-	_, _ = cv.WriteString(strconv.Itoa(m.items.Len()))
-	_, _ = cv.WriteRune(' ')
-	_, _ = v.WriteString(cv.String())
-	_, _ = v.WriteString(strings.Repeat("─", max(m.windowWidth-cv.Len(), 0)))
+	if m.fzf.option.countViewEnabled {
+		_, _ = v.WriteRune('\n')
+		_, _ = v.WriteString(m.fzf.option.countViewFunc(m.items.Len(), m.matches.Len(), m.windowWidth))
+	}
 
 	return v.String()
 }

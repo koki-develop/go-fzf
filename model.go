@@ -2,6 +2,7 @@ package fzf
 
 import (
 	"strings"
+	"time"
 
 	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/textinput"
@@ -15,6 +16,7 @@ var (
 
 type model struct {
 	items      *items
+	itemsLen   int
 	option     *option
 	findOption *findOption
 
@@ -94,6 +96,7 @@ func (m *model) setItems(items *items) {
 	}
 
 	m.items = items
+	m.itemsLen = items.Len()
 	m.matches = matches
 }
 
@@ -102,9 +105,16 @@ func (m *model) setFindOption(findOption *findOption) {
 }
 
 func (m *model) Init() tea.Cmd {
-	return tea.Batch(
+	cmds := []tea.Cmd{
 		textinput.Blink,
 		tea.EnterAltScreen,
+	}
+	if m.option.hotReloadLocker != nil {
+		cmds = append(cmds, m.watchReload())
+	}
+
+	return tea.Batch(
+		cmds...,
 	)
 }
 
@@ -198,6 +208,8 @@ func (m *model) itemsView() string {
  * update
  */
 
+type watchReloadMsg struct{}
+
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
@@ -232,6 +244,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.input.Width = m.windowWidth - m.promptWidth
 		m.fixYPosition()
 		m.fixCursor()
+	case watchReloadMsg:
+		return m, m.watchReload()
 	}
 
 	var cmds []tea.Cmd
@@ -335,4 +349,17 @@ func (m *model) fixYPosition() {
 		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-headerHeight), 0)
 		return
 	}
+}
+
+func (m *model) watchReload() tea.Cmd {
+	return tea.Tick(30*time.Millisecond, func(_ time.Time) tea.Msg {
+		m.option.hotReloadLocker.Lock()
+		defer m.option.hotReloadLocker.Unlock()
+
+		if m.itemsLen != m.items.Len() {
+			m.setItems(m.items)
+		}
+
+		return watchReloadMsg{}
+	})
 }

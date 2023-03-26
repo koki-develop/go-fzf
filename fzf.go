@@ -13,7 +13,6 @@ var defaultFindOption = findOption{
 
 // Fuzzy Finder.
 type FZF struct {
-	option  *option
 	model   *model
 	program *tea.Program
 }
@@ -28,7 +27,6 @@ func New(opts ...Option) *FZF {
 	m := newModel(&o)
 
 	return &FZF{
-		option:  &o,
 		model:   m,
 		program: tea.NewProgram(m),
 	}
@@ -42,11 +40,14 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 	}
 
 	rv := reflect.ValueOf(items)
-	switch {
-	case rv.Kind() == reflect.Slice:
-	case rv.Kind() == reflect.Ptr && reflect.Indirect(rv).Kind() == reflect.Slice:
-	default:
-		return nil, fmt.Errorf("items must be a slice, but got %T", items)
+	if fzf.model.option.hotReloadLocker == nil {
+		if rv.Kind() != reflect.Slice {
+			return nil, fmt.Errorf("items must be a slice, but got %T", items)
+		}
+	} else {
+		if !(rv.Kind() == reflect.Ptr && reflect.Indirect(rv).Kind() == reflect.Slice) {
+			return nil, fmt.Errorf("items must be a pointer to slice, but got %T", items)
+		}
 	}
 
 	is, err := newItems(rv, itemFunc)

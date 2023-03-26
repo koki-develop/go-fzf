@@ -152,8 +152,12 @@ func (m *model) itemsView() string {
 
 	headerHeight := m.headerHeight()
 
-	for i, match := range m.matches[m.windowYPosition:] {
-		cursorLine := m.cursorPosition == i+m.windowYPosition
+	for i, match := range m.matches {
+		if i < m.windowYPosition {
+			continue
+		}
+
+		cursorLine := m.cursorPosition == i
 
 		// write cursor
 		if cursorLine {
@@ -192,7 +196,7 @@ func (m *model) itemsView() string {
 			}
 		}
 
-		if i+1 >= m.windowHeight-headerHeight {
+		if i+1-m.windowYPosition >= m.windowHeight-headerHeight {
 			break
 		}
 		v.WriteString("\n")
@@ -209,6 +213,11 @@ type watchReloadMsg struct{}
 type forceReloadMsg struct{}
 
 func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	if m.option.hotReloadLocker != nil {
+		m.option.hotReloadLocker.Lock()
+		defer m.option.hotReloadLocker.Unlock()
+	}
+
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
 		// key
@@ -259,10 +268,6 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 	if beforeValue != m.input.Value() {
-		if m.option.hotReloadLocker != nil {
-			m.option.hotReloadLocker.Lock()
-			defer m.option.hotReloadLocker.Unlock()
-		}
 		m.filter()
 		m.fixYPosition()
 		m.fixCursor()
@@ -359,16 +364,11 @@ func (m *model) fixYPosition() {
 }
 
 func (m *model) forceReload() {
-	m.option.hotReloadLocker.Lock()
-	defer m.option.hotReloadLocker.Unlock()
 	m.loadItems(m.items)
 }
 
 func (m *model) watchReload() tea.Cmd {
 	return tea.Tick(30*time.Millisecond, func(_ time.Time) tea.Msg {
-		m.option.hotReloadLocker.Lock()
-		defer m.option.hotReloadLocker.Unlock()
-
 		if m.itemsLen != m.items.Len() {
 			m.loadItems(m.items)
 		}

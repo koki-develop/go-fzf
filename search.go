@@ -6,6 +6,16 @@ import (
 	"sync"
 )
 
+var (
+	defaultSearchOption = searchOption{
+		caseSensitive: false,
+	}
+)
+
+type searchOption struct {
+	caseSensitive bool
+}
+
 type Items interface {
 	String(i int) string
 	Len() int
@@ -38,8 +48,21 @@ func (m Matches) Sort() {
 	})
 }
 
-func Search(items Items, search string, caseSensitive bool) Matches {
-	if !caseSensitive {
+type SearchOption func(o *searchOption)
+
+func WithSearchCaseSensitive(c bool) SearchOption {
+	return func(o *searchOption) {
+		o.caseSensitive = c
+	}
+}
+
+func Search(items Items, search string, opts ...SearchOption) Matches {
+	o := defaultSearchOption
+	for _, opt := range opts {
+		opt(&o)
+	}
+
+	if !o.caseSensitive {
 		search = strings.ToLower(search)
 	}
 
@@ -67,7 +90,7 @@ func Search(items Items, search string, caseSensitive bool) Matches {
 				for index := start; index < end; index++ {
 					item := items.String(index)
 
-					if !caseSensitive {
+					if !o.caseSensitive {
 						item = strings.ToLower(item)
 					}
 

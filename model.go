@@ -329,7 +329,7 @@ func (m *model) filter() {
 		return
 	}
 
-	m.matches = Search(m.items, s, m.option.caseSensitive)
+	m.matches = Search(m.items, s, WithSearchCaseSensitive(m.option.caseSensitive))
 }
 
 func (m *model) fixCursor() {

@@ -1,7 +1,6 @@
 package fzf
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/charmbracelet/bubbles/key"
@@ -95,7 +94,13 @@ func (m *model) Init() tea.Cmd {
  */
 
 func (m *model) View() string {
-	return fmt.Sprintf("%s\n%s", m.headerView(), m.itemsView())
+	var v strings.Builder
+
+	_, _ = v.WriteString(m.headerView())
+	_, _ = v.WriteRune('\n')
+	_, _ = v.WriteString(m.itemsView())
+
+	return v.String()
 }
 
 func (m *model) headerView() string {

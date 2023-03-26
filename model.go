@@ -115,6 +115,11 @@ func (m *model) Init() tea.Cmd {
  */
 
 func (m *model) View() string {
+	if m.option.hotReloadLocker != nil {
+		m.option.hotReloadLocker.Lock()
+		defer m.option.hotReloadLocker.Unlock()
+	}
+
 	var v strings.Builder
 
 	_, _ = v.WriteString(m.headerView())
@@ -254,6 +259,10 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 	if beforeValue != m.input.Value() {
+		if m.option.hotReloadLocker != nil {
+			m.option.hotReloadLocker.Lock()
+			defer m.option.hotReloadLocker.Unlock()
+		}
 		m.filter()
 		m.fixYPosition()
 		m.fixCursor()

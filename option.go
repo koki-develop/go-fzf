@@ -1,6 +1,9 @@
 package fzf
 
 import (
+	"strconv"
+	"strings"
+
 	"github.com/charmbracelet/bubbles/key"
 )
 
@@ -22,6 +25,17 @@ var defaultOption = option{
 		Choose: key.NewBinding(key.WithKeys("enter")),
 		Abort:  key.NewBinding(key.WithKeys("ctrl+c", "esc")),
 	},
+
+	countViewEnabled: true,
+	countViewFunc: func(itemsCount, matchesCount, windowWidth int) string {
+		var v strings.Builder
+		_, _ = v.WriteString(strconv.Itoa(matchesCount))
+		_, _ = v.WriteRune('/')
+		_, _ = v.WriteString(strconv.Itoa(itemsCount))
+		_, _ = v.WriteRune(' ')
+		_, _ = v.WriteString(strings.Repeat("─", max(windowWidth-v.Len(), 0)))
+		return v.String()
+	},
 }
 
 type option struct {
@@ -36,6 +50,9 @@ type option struct {
 	styles           *Styles
 
 	keymap *keymap
+
+	countViewEnabled bool
+	countViewFunc    func(itemsCount, matchesCount, windowWidth int) string
 }
 
 // Option represents a option for the Fuzzy Finder.
@@ -115,5 +132,19 @@ func WithKeyMap(km KeyMap) Option {
 func WithInputPlaceholder(p string) Option {
 	return func(o *option) {
 		o.inputPlaceholder = p
+	}
+}
+
+// WithCountViewEnabled enables or disables count view.
+func WithCountViewEnabled(b bool) Option {
+	return func(o *option) {
+		o.countViewEnabled = b
+	}
+}
+
+// WithCountView sets the function to create the count view.
+func WithCountView(f func(itemsCount, matchesCount, windowWidth int) string) Option {
+	return func(o *option) {
+		o.countViewFunc = f
 	}
 }

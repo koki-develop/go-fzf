@@ -7,7 +7,6 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
-	"github.com/sahilm/fuzzy"
 )
 
 var (
@@ -35,7 +34,7 @@ type model struct {
 	cursorLineStyle        lipgloss.Style
 	cursorLineMatchesStyle lipgloss.Style
 
-	matches fuzzy.Matches
+	matches matches
 	choices []int
 
 	// window
@@ -57,9 +56,9 @@ func newModel(fzf *FZF, items *items, opt *findOption) *model {
 		fzf.option.keymap.Toggle.SetEnabled(false)
 	}
 
-	var matches fuzzy.Matches
+	var matches matches
 	for i := 0; i < items.Len(); i++ {
-		matches = append(matches, fuzzy.Match{
+		matches = append(matches, match{
 			Str:   items.String(i),
 			Index: i,
 		})
@@ -125,7 +124,7 @@ func (m *model) headerView() string {
 	// count
 	if m.fzf.option.countViewEnabled {
 		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.fzf.option.countViewFunc(m.items.Len(), m.matches.Len(), m.windowWidth))
+		_, _ = v.WriteString(m.fzf.option.countViewFunc(m.items.Len(), len(m.matches), m.windowWidth))
 	}
 
 	return v.String()
@@ -250,7 +249,7 @@ func (m *model) choice() {
 		return
 	}
 
-	if m.matches.Len() == 0 {
+	if len(m.matches) == 0 {
 		return
 	}
 
@@ -258,7 +257,7 @@ func (m *model) choice() {
 }
 
 func (m *model) toggle() {
-	if m.matches.Len() == 0 {
+	if len(m.matches) == 0 {
 		return
 	}
 
@@ -287,9 +286,9 @@ func (m *model) cursorDown() {
 func (m *model) filter() {
 	s := m.input.Value()
 	if s == "" {
-		var matches fuzzy.Matches
+		var matches matches
 		for i := 0; i < m.items.Len(); i++ {
-			matches = append(matches, fuzzy.Match{
+			matches = append(matches, match{
 				Str:   m.items.String(i),
 				Index: i,
 			})
@@ -298,7 +297,7 @@ func (m *model) filter() {
 		return
 	}
 
-	m.matches = fuzzy.FindFrom(s, m.items)
+	m.matches = fuzzySearch(m.items, s)
 }
 
 func (m *model) fixCursor() {

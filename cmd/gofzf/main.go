@@ -30,6 +30,8 @@ var (
 	flagUnselectedPrefix string
 	flagInputPlaceholder string
 
+	flagCountView bool
+
 	flagCursorFg            string
 	flagCursorBg            string
 	flagCursorBold          bool
@@ -129,6 +131,9 @@ var rootCmd = &cobra.Command{
 			fzf.WithSelectedPrefix(flagSelectedPrefix),
 			fzf.WithUnselectedPrefix(flagUnselectedPrefix),
 			fzf.WithInputPlaceholder(flagInputPlaceholder),
+
+			fzf.WithCountViewEnabled(flagCountView),
+
 			fzf.WithStyles(
 				fzf.WithStyleCursor(fzf.Style{
 					ForegroundColor: flagCursorFg,
@@ -222,6 +227,8 @@ func init() {
 	rootCmd.Flags().StringVar(&flagSelectedPrefix, "selected-prefix", "● ", "")
 	rootCmd.Flags().StringVar(&flagUnselectedPrefix, "unselected-prefix", "◯ ", "")
 	rootCmd.Flags().StringVar(&flagInputPlaceholder, "input-placeholder", "Filter...", "")
+
+	rootCmd.Flags().BoolVar(&flagCountView, "count-view", true, "")
 
 	rootCmd.Flags().StringVar(&flagCursorFg, "cursor-fg", mainColor, "")
 	rootCmd.Flags().StringVar(&flagCursorBg, "cursor-bg", "", "")

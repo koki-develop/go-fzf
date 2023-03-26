@@ -72,6 +72,12 @@ func (fzf *FZF) Quit() {
 	fzf.program.Quit()
 }
 
+// Abort aborts the Fuzzy Finder.
+func (fzf *FZF) Abort() {
+	fzf.model.abort = true
+	fzf.Quit()
+}
+
 // Option represents a option for the Find.
 type FindOption func(o *findOption)
 

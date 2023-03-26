@@ -329,7 +329,7 @@ func (m *model) filter() {
 		return
 	}
 
-	m.matches = fuzzySearch(m.items, s)
+	m.matches = fuzzySearch(m.items, s, m.option.caseSensitive)
 }
 
 func (m *model) fixCursor() {

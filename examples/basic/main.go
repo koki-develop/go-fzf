@@ -10,12 +10,7 @@ import (
 func main() {
 	items := []string{"hello", "world", "foo", "bar"}
 
-	f, err := fzf.New(
-		fzf.WithStyles(
-			fzf.WithStyleCursor(fzf.Style{ForegroundColor: "#ff0000"}),
-			fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#00ff00"}),
-		),
-	)
+	f, err := fzf.New()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -1,13 +1,23 @@
-# go-fzf
+<h1 align="center">go-fzf</h1>
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/koki-develop/go-fzf.svg)](https://pkg.go.dev/github.com/koki-develop/go-fzf)
-[![GitHub release (latest by date)](https://img.shields.io/github/v/release/koki-develop/go-fzf?style=flat-square)](https://github.com/koki-develop/go-fzf/releases/latest)
-[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/koki-develop/go-fzf/ci.yml?logo=github&style=flat-square)](https://github.com/koki-develop/go-fzf/actions/workflows/ci.yml)
-[![Maintainability](https://img.shields.io/codeclimate/maintainability/koki-develop/go-fzf?style=flat-square&logo=codeclimate)](https://codeclimate.com/github/koki-develop/go-fzf/maintainability)
-[![Go Report Card](https://goreportcard.com/badge/github.com/koki-develop/go-fzf?style=flat-square)](https://goreportcard.com/report/github.com/koki-develop/go-fzf)
-[![LICENSE](https://img.shields.io/github/license/koki-develop/go-fzf?style=flat-square)](./LICENSE)
+<p align="center">
+<a href="https://pkg.go.dev/github.com/koki-develop/go-fzf"><img src="https://pkg.go.dev/badge/github.com/koki-develop/go-fzf.svg" alt="Go Reference"></a>
+<a href="https://github.com/koki-develop/go-fzf/releases/latest"><img src="https://img.shields.io/github/v/release/koki-develop/go-fzf?style=flat-square" alt="GitHub release (latest by date)"></a>
+<a href="https://github.com/koki-develop/go-fzf/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/koki-develop/go-fzf/ci.yml?logo=github&amp;style=flat-square" alt="GitHub Workflow Status"></a>
+<a href="https://codeclimate.com/github/koki-develop/go-fzf/maintainability"><img src="https://img.shields.io/codeclimate/maintainability/koki-develop/go-fzf?style=flat-square&amp;logo=codeclimate" alt="Maintainability"></a>
+<a href="https://goreportcard.com/report/github.com/koki-develop/go-fzf"><img src="https://goreportcard.com/badge/github.com/koki-develop/go-fzf?style=flat-square" alt="Go Report Card"></a>
+<a href="./LICENSE"><img src="https://img.shields.io/github/license/koki-develop/go-fzf?style=flat-square" alt="LICENSE"></a>
+</p>
 
+<p align="center">
 Fuzzy Finder CLI and Library.
+</p>
+
+<p align="center">
+English | <a href="./README.ja.md">日本語</a>
+</p>
+
+## Contents
 
 - [Usage](#usage)
   - [CLI](#using-as-a-cli)

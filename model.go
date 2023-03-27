@@ -137,7 +137,12 @@ func (m *model) headerView() string {
 	// count
 	if m.option.countViewEnabled {
 		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.option.countViewFunc(m.items.Len(), len(m.matches), m.windowWidth))
+		_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
+			ItemsCount:    m.items.Len(),
+			MatchesCount:  len(m.matches),
+			SelectedCount: len(m.choices),
+			WindowWidth:   m.windowWidth,
+		}))
 	}
 
 	return v.String()

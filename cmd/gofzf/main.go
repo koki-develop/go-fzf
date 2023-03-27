@@ -8,6 +8,8 @@ import (
 	"os"
 	"path/filepath"
 	"runtime/debug"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/koki-develop/go-fzf"
@@ -103,6 +105,29 @@ var rootCmd = &cobra.Command{
 			fzf.WithInputPlaceholder(flagInputPlaceholder),
 
 			fzf.WithCountViewEnabled(flagCountView),
+			fzf.WithCountView(func(meta fzf.CountViewMeta) string {
+				var v strings.Builder
+				_, _ = v.WriteString(strconv.Itoa(meta.MatchesCount))
+				_, _ = v.WriteRune('/')
+				_, _ = v.WriteString(strconv.Itoa(meta.ItemsCount))
+				_, _ = v.WriteRune(' ')
+				if flagLimit > 1 || flagNoLimit {
+					_, _ = v.WriteString("(")
+					_, _ = v.WriteString(strconv.Itoa(meta.SelectedCount))
+					if !flagNoLimit {
+						_, _ = v.WriteRune('/')
+						_, _ = v.WriteString(strconv.Itoa(flagLimit))
+					}
+					_, _ = v.WriteString(") ")
+				}
+
+				borderw := meta.WindowWidth - v.Len()
+				if borderw < 0 {
+					borderw = 0
+				}
+				_, _ = v.WriteString(strings.Repeat("─", borderw))
+				return v.String()
+			}),
 
 			fzf.WithStyles(
 				fzf.WithStyleCursor(fzf.Style{

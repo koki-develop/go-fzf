@@ -29,17 +29,25 @@ var defaultOption = option{
 	},
 
 	countViewEnabled: true,
-	countViewFunc: func(itemsCount, matchesCount, windowWidth int) string {
+	countViewFunc: func(meta CountViewMeta) string {
 		var v strings.Builder
-		_, _ = v.WriteString(strconv.Itoa(matchesCount))
+		_, _ = v.WriteString(strconv.Itoa(meta.MatchesCount))
 		_, _ = v.WriteRune('/')
-		_, _ = v.WriteString(strconv.Itoa(itemsCount))
+		_, _ = v.WriteString(strconv.Itoa(meta.ItemsCount))
 		_, _ = v.WriteRune(' ')
-		_, _ = v.WriteString(strings.Repeat("─", max(windowWidth-v.Len(), 0)))
+		_, _ = v.WriteString(strings.Repeat("─", max(meta.WindowWidth-v.Len(), 0)))
 		return v.String()
 	},
 
 	hotReloadLocker: nil,
+}
+
+// CountViewMeta provides information used in count view.
+type CountViewMeta struct {
+	ItemsCount    int
+	MatchesCount  int
+	SelectedCount int
+	WindowWidth   int
 }
 
 type option struct {
@@ -57,7 +65,7 @@ type option struct {
 	keymap *keymap
 
 	countViewEnabled bool
-	countViewFunc    func(itemsCount, matchesCount, windowWidth int) string
+	countViewFunc    func(meta CountViewMeta) string
 
 	hotReloadLocker sync.Locker
 }
@@ -154,7 +162,7 @@ func WithCountViewEnabled(b bool) Option {
 }
 
 // WithCountView sets the function to create the count view.
-func WithCountView(f func(itemsCount, matchesCount, windowWidth int) string) Option {
+func WithCountView(f func(meta CountViewMeta) string) Option {
 	return func(o *option) {
 		o.countViewFunc = f
 	}

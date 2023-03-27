@@ -91,7 +91,7 @@ var rootCmd = &cobra.Command{
 		var items []string
 		var mu sync.RWMutex
 
-		f := fzf.New(
+		f, err := fzf.New(
 			fzf.WithNoLimit(flagNoLimit),
 			fzf.WithLimit(flagLimit),
 			fzf.WithCaseSensitive(flagCaseSensitive),
@@ -182,6 +182,9 @@ var rootCmd = &cobra.Command{
 				}),
 			),
 		)
+		if err != nil {
+			return err
+		}
 
 		ctx := context.Background()
 		g, ctx := errgroup.WithContext(ctx)

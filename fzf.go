@@ -19,10 +19,14 @@ type FZF struct {
 }
 
 // New returns a new Fuzzy Finder.
-func New(opts ...Option) *FZF {
+func New(opts ...Option) (*FZF, error) {
 	o := defaultOption
 	for _, opt := range opts {
 		opt(&o)
+	}
+
+	if o.limit < 1 {
+		return nil, errors.New("limit must be at least 1")
 	}
 
 	m := newModel(&o)
@@ -30,7 +34,7 @@ func New(opts ...Option) *FZF {
 	return &FZF{
 		model:   m,
 		program: tea.NewProgram(m),
-	}
+	}, nil
 }
 
 // Find launches the Fuzzy Finder and returns a list of indexes of the selected items.

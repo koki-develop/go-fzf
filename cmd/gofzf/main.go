@@ -234,8 +234,12 @@ var rootCmd = &cobra.Command{
 					}
 
 					if !d.IsDir() {
+						p, err := filepath.Rel(wd, path)
+						if err != nil {
+							return err
+						}
 						mu.Lock()
-						items = append(items, path)
+						items = append(items, p)
 						mu.Unlock()
 					}
 

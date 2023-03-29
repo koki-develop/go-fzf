@@ -11,6 +11,7 @@ func main() {
 	items := []string{"hello", "world", "foo", "bar"}
 
 	f, err := fzf.New(
+		fzf.WithNoLimit(true),
 		fzf.WithSelectedPrefix("[x] "),
 		fzf.WithUnselectedPrefix("[ ] "),
 	)

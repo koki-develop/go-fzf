@@ -2,11 +2,11 @@
 
 ## Contents
 
-- [Installation](TODO)
-- [Usage](TODO)
-  - [Basic](TODO)
-  - [Select Multiple](TODO)
-  - [Customize Styles](TODO)
+- [Installation](#installation)
+- [Usage](#usage)
+  - [Basic](#basic)
+  - [Select Multiple](#select-multiple)
+  - [Customize UI](#customize-ui)
 
 ## Installation
 
@@ -49,7 +49,7 @@ Setting the `--no-limit` flag allows unlimited item selection.
 
 ![](./no-limit.gif)
 
-### Customize Styles
+### Customize UI
 
 The `gofzf` CLI allows for various visual customizations using flags.
 

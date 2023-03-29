@@ -25,11 +25,13 @@ func main() {
 		}
 	}()
 
+	// pass locker
 	f, err := fzf.New(fzf.WithHotReload(&mu))
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	// NOTE: Note that a pointer to slice must be passed.
 	idxs, err := f.Find(&items, func(i int) string { return items[i] })
 	if err != nil {
 		log.Fatal(err)

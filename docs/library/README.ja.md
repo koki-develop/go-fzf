@@ -30,7 +30,7 @@ import "github.com/koki-develop/go-fzf"
 
 ### 基本
 
-まず `fzf.New()` Fuzzy Finder を初期化します。
+まず `fzf.New()` で Fuzzy Finder を初期化します。
 
 ```go
 f, err := fzf.New()
@@ -54,7 +54,7 @@ if err != nil {
 
 ### 複数選択
 
-`fzf.WIthLimit()` を使用すると選択できるアイテムの数を設定できます。
+`fzf.WithLimit()` を使用すると選択できるアイテムの数を設定できます。
 
 ```go
 f, err := fzf.New(fzf.WithLimit(4))
@@ -237,17 +237,18 @@ if err != nil {
 
 #### スタイル
 
-`fzf.WithStyles()` を使用すると各コンポーネントのスタイルを設定することができます。
+`fzf.WithStyles()` を使用すると各コンポーネントのスタイルを設定することができます。  
+使用できるスタイルについては[リファレンス](https://pkg.go.dev/github.com/koki-develop/go-fzf#Style)をご参照ください。
 
 ```go
 f, err := fzf.New(
   fzf.WithNoLimit(true),
   fzf.WithStyles(
-    fzf.WithStyleCursor(fzf.Style{Bold: true}),
-    fzf.WithStyleCursorLine(fzf.Style{Bold: true}),
-    fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),
-    fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: "#ff0000"}),
-    fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),
+    fzf.WithStyleCursor(fzf.Style{Bold: true}),                         // カーソル
+    fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                     // カーソル行
+    fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),        // 一致文字
+    fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: "#ff0000"}), // 選択中アイテムの接頭辞
+    fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),              // 未選択のアイテムの接頭辞
   ),
 )
 if err != nil {

@@ -13,11 +13,11 @@ func main() {
 	f, err := fzf.New(
 		fzf.WithNoLimit(true),
 		fzf.WithStyles(
-			fzf.WithStyleCursor(fzf.Style{Bold: true}),
-			fzf.WithStyleCursorLine(fzf.Style{Bold: true}),
-			fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),
-			fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: "#ff0000"}),
-			fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),
+			fzf.WithStyleCursor(fzf.Style{Bold: true}),                         // Cursor
+			fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                     // Cursor line
+			fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),        // Matched characters
+			fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: "#ff0000"}), // Prefix of selected items
+			fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),              // Prefix of unselected items
 		),
 	)
 	if err != nil {

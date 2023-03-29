@@ -38,7 +38,7 @@ Type "world"
 Sleep 750ms
 Tab
 Sleep 750ms
-Backspace 3
+Backspace 5
 Sleep 750ms
 
 Type "foo"

@@ -69,7 +69,7 @@ func main() {
 }
 ```
 
-![](./docs/library/demo.gif)
+![](./examples/basic/demo.gif)
 
 For more information, please refer to the [documentation](./docs/library/README.md)  
 Additionally, various samples of how to use go-fzf are available in the [examples](./examples/) directory.

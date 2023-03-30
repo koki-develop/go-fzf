@@ -17,10 +17,14 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
+
+      # to install ttyd and ffmpeg
       - uses: charmbracelet/vhs-action@v1
         with:
           path: ./tapes/cli/demo.tape
           token: ${{ secrets.GITHUB_TOKEN }}
+      - name: install vhs
+        run: go install github.com/charmbracelet/vhs@latest
 
       - name: update cli gif
         run: |

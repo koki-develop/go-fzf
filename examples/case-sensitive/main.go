@@ -8,14 +8,9 @@ import (
 )
 
 func main() {
-	items := []string{"hello", "world", "foo", "bar"}
+	items := []string{"HELLO", "Hello", "hello"}
 
-	f, err := fzf.New(
-		fzf.WithStyles(
-			fzf.WithStyleCursor(fzf.Style{ForegroundColor: "#ff0000"}),
-			fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#00ff00"}),
-		),
-	)
+	f, err := fzf.New(fzf.WithCaseSensitive(true))
 	if err != nil {
 		log.Fatal(err)
 	}

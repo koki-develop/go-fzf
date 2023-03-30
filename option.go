@@ -35,7 +35,21 @@ var defaultOption = option{
 		_, _ = v.WriteRune('/')
 		_, _ = v.WriteString(strconv.Itoa(meta.ItemsCount))
 		_, _ = v.WriteRune(' ')
-		_, _ = v.WriteString(strings.Repeat("─", max(meta.WindowWidth-v.Len(), 0)))
+		if meta.Limit > 1 || meta.NoLimit {
+			_, _ = v.WriteString("(")
+			_, _ = v.WriteString(strconv.Itoa(meta.SelectedCount))
+			if !meta.NoLimit {
+				_, _ = v.WriteRune('/')
+				_, _ = v.WriteString(strconv.Itoa(meta.Limit))
+			}
+			_, _ = v.WriteString(") ")
+		}
+
+		borderw := meta.WindowWidth - v.Len()
+		if borderw < 0 {
+			borderw = 0
+		}
+		_, _ = v.WriteString(strings.Repeat("─", borderw))
 		return v.String()
 	},
 
@@ -48,6 +62,8 @@ type CountViewMeta struct {
 	MatchesCount  int
 	SelectedCount int
 	WindowWidth   int
+	Limit         int
+	NoLimit       bool
 }
 
 type option struct {

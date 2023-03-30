@@ -14,7 +14,7 @@ Fuzzy Finder CLI and Library.
 </p>
 
 <p align="center">
-English | <a href="./README.ja.md">日本語</a>
+[English](./README.md) | 日本語
 </p>
 
 ## 目次

@@ -142,6 +142,8 @@ func (m *model) headerView() string {
 			MatchesCount:  len(m.matches),
 			SelectedCount: len(m.choices),
 			WindowWidth:   m.windowWidth,
+			Limit:         m.option.limit,
+			NoLimit:       m.option.noLimit,
 		}))
 	}
 

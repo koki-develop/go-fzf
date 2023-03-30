@@ -19,7 +19,7 @@ jobs:
           go-version-file: go.mod
       - uses: charmbracelet/vhs-action@v1
         with:
-          path: ./tapes/cli-demo.tape
+          path: ./tapes/cli/demo.tape
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: update cli gif

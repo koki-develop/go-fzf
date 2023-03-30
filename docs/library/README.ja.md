@@ -10,7 +10,7 @@
 まず `go get` で最新バージョンをインストールしてください。
 
 ```console
-go get -u github.com/koki-develop/go-fzf
+$ go get -u github.com/koki-develop/go-fzf
 ```
 
 次に go-fzf を import してください。

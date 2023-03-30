@@ -17,15 +17,21 @@ jobs:
       - uses: actions/setup-go@v4
         with:
           go-version-file: go.mod
-
       - uses: charmbracelet/vhs-action@v1
         with:
           path: ./tapes/cli-demo.tape
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: charmbracelet/vhs-action@v1
-        with:
-          path: ./tapes/library-demo.tape
-          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: update cli gif
+        run: |
+          for t in ./tapes/cli/*; do
+            vhs < $t
+          done
+      - name: update library gif
+        run: |
+          for t in ./tapes/library/*; do
+            vhs < $t
+          done
 
       - uses: peter-evans/create-pull-request@v4
         with:

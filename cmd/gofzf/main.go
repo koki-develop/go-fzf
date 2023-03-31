@@ -29,10 +29,10 @@ var (
 	flagCaseSensitive bool
 
 	flagPrompt           string
+	flagInputPlaceholder string
 	flagCursor           string
 	flagSelectedPrefix   string
 	flagUnselectedPrefix string
-	flagInputPlaceholder string
 
 	flagCountView bool
 
@@ -44,6 +44,15 @@ var (
 	flagPromptStrikethrough bool
 	flagPromptUnderline     bool
 	flagPromptFaint         bool
+
+	flagInputPlaceholderFg            string
+	flagInputPlaceholderBg            string
+	flagInputPlaceholderBold          bool
+	flagInputPlaceholderBlink         bool
+	flagInputPlaceholderItalic        bool
+	flagInputPlaceholderStrikethrough bool
+	flagInputPlaceholderUnderline     bool
+	flagInputPlaceholderFaint         bool
 
 	flagCursorFg            string
 	flagCursorBg            string
@@ -106,10 +115,10 @@ var rootCmd = &cobra.Command{
 			fzf.WithHotReload(mu.RLocker()),
 
 			fzf.WithPrompt(flagPrompt),
+			fzf.WithInputPlaceholder(flagInputPlaceholder),
 			fzf.WithCursor(flagCursor),
 			fzf.WithSelectedPrefix(flagSelectedPrefix),
 			fzf.WithUnselectedPrefix(flagUnselectedPrefix),
-			fzf.WithInputPlaceholder(flagInputPlaceholder),
 
 			fzf.WithCountViewEnabled(flagCountView),
 
@@ -123,6 +132,16 @@ var rootCmd = &cobra.Command{
 					Strikethrough:   flagPromptStrikethrough,
 					Underline:       flagPromptUnderline,
 					Faint:           flagPromptFaint,
+				}),
+				fzf.WithStyleInputPlaceholder(fzf.Style{
+					ForegroundColor: flagInputPlaceholderFg,
+					BackgroundColor: flagInputPlaceholderBg,
+					Bold:            flagInputPlaceholderBold,
+					Blink:           flagInputPlaceholderBlink,
+					Italic:          flagInputPlaceholderItalic,
+					Strikethrough:   flagInputPlaceholderStrikethrough,
+					Underline:       flagInputPlaceholderUnderline,
+					Faint:           flagInputPlaceholderFaint,
 				}),
 				fzf.WithStyleCursor(fzf.Style{
 					ForegroundColor: flagCursorFg,
@@ -297,10 +316,10 @@ func init() {
 	rootCmd.Flags().BoolVar(&flagCaseSensitive, "case-sensitive", false, "case sensitive search")
 
 	rootCmd.Flags().StringVar(&flagPrompt, "prompt", "> ", "")
+	rootCmd.Flags().StringVar(&flagInputPlaceholder, "input-placeholder", "Filter...", "")
 	rootCmd.Flags().StringVar(&flagCursor, "cursor", "> ", "")
 	rootCmd.Flags().StringVar(&flagSelectedPrefix, "selected-prefix", "● ", "")
 	rootCmd.Flags().StringVar(&flagUnselectedPrefix, "unselected-prefix", "◯ ", "")
-	rootCmd.Flags().StringVar(&flagInputPlaceholder, "input-placeholder", "Filter...", "")
 
 	rootCmd.Flags().BoolVar(&flagCountView, "count-view", true, "")
 
@@ -312,6 +331,15 @@ func init() {
 	rootCmd.Flags().BoolVar(&flagPromptStrikethrough, "prompt-strike", false, "")
 	rootCmd.Flags().BoolVar(&flagPromptUnderline, "prompt-underline", false, "")
 	rootCmd.Flags().BoolVar(&flagPromptFaint, "prompt-faint", false, "")
+
+	rootCmd.Flags().StringVar(&flagInputPlaceholderFg, "input-placeholder-fg", "", "")
+	rootCmd.Flags().StringVar(&flagInputPlaceholderBg, "input-placeholder-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagInputPlaceholderBold, "input-placeholder-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagInputPlaceholderBlink, "input-placeholder-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagInputPlaceholderItalic, "input-placeholder-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagInputPlaceholderStrikethrough, "input-placeholder-strike", false, "")
+	rootCmd.Flags().BoolVar(&flagInputPlaceholderUnderline, "input-placeholder-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagInputPlaceholderFaint, "input-placeholder-faint", true, "")
 
 	rootCmd.Flags().StringVar(&flagCursorFg, "cursor-fg", mainColor, "")
 	rootCmd.Flags().StringVar(&flagCursorBg, "cursor-bg", "", "")

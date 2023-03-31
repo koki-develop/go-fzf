@@ -62,9 +62,17 @@ The `gofzf` CLI allows for various visual customizations using flags.
 
 #### Prompt
 
-| Flag       | Default | Description    |
-| ---------- | ------- | -------------- |
-| `--prompt` | `"> "`  | Prompt string. |
+| Flag                 | Default | Description                 |
+| -------------------- | ------- | --------------------------- |
+| `--prompt`           | `"> "`  | Prompt string.              |
+| `--prompt-fg`        | N/A     | Foreground color of prompt. |
+| `--prompt-bg`        | N/A     | Background color of prompt. |
+| `--prompt-bold`      | `false` | Bold prompt.                |
+| `--prompt-blink`     | `false` | Blink prompt.               |
+| `--prompt-italic`    | `false` | Italicize prompt.           |
+| `--prompt-strike`    | `false` | Strkethrough prompt.        |
+| `--prompt-underline` | `false` | Underline prompt.           |
+| `--prompt-faint`     | `false` | Faint prompt.               |
 
 #### Cursor
 

@@ -244,6 +244,7 @@ if err != nil {
 f, err := fzf.New(
   fzf.WithNoLimit(true),
   fzf.WithStyles(
+    fzf.WithStylePrompt(fzf.Style{Faint: true}),                        // プロンプト
     fzf.WithStyleCursor(fzf.Style{Bold: true}),                         // カーソル
     fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                     // カーソル行
     fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),        // 一致文字

@@ -248,6 +248,7 @@ f, err := fzf.New(
   fzf.WithStyles(
     fzf.WithStylePrompt(fzf.Style{Faint: true}),                                       // Prompt
     fzf.WithStyleInputPlaceholder(fzf.Style{Faint: true, ForegroundColor: "#ff0000"}), // Placeholder for input
+    fzf.WithStyleInputText(fzf.Style{Italic: true}),                                   // Input text
     fzf.WithStyleCursor(fzf.Style{Bold: true}),                                        // Cursor
     fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                                    // Cursor line
     fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),                       // Matched characters

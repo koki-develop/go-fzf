@@ -55,6 +55,7 @@ The `gofzf` CLI allows for various visual customizations using flags.
 
 - [Prompt](#prompt)
 - [Placeholder for input](#placeholder-for-input)
+- [Input text](#input-text)
 - [Cursor](#cursor)
 - [Cursor Line](#cursor-line)
 - [Prefix of selected/unselected items](#prefix-of-selectedunselected-items)
@@ -87,6 +88,19 @@ The `gofzf` CLI allows for various visual customizations using flags.
 | `--input-placeholder-strike`    | `false`       | Strkethrough placeholder for input.        |
 | `--input-placeholder-underline` | `false`       | Underline placeholder for input.           |
 | `--input-placeholder-faint`     | `true`        | Faint placeholder for input.               |
+
+#### Input text
+
+| Flag                     | Default | Description                     |
+| ------------------------ | ------- | ------------------------------- |
+| `--input-text-fg`        | N/A     | Foreground color of input text. |
+| `--input-text-bg`        | N/A     | Background color of input text. |
+| `--input-text-bold`      | `false` | Bold input text.                |
+| `--input-text-blink`     | `false` | Blink input text.               |
+| `--input-text-italic`    | `false` | Italicize input text.           |
+| `--input-text-strike`    | `false` | Strkethrough input text.        |
+| `--input-text-underline` | `false` | Underline input text.           |
+| `--input-text-faint`     | `false` | Faint input text.               |
 
 #### Cursor
 

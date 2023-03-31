@@ -86,7 +86,7 @@ The `gofzf` CLI allows for various visual customizations using flags.
 | `--input-placeholder-italic`    | `false`       | Italicize placeholder for input.           |
 | `--input-placeholder-strike`    | `false`       | Strkethrough placeholder for input.        |
 | `--input-placeholder-underline` | `false`       | Underline placeholder for input.           |
-| `--input-placeholder-faint`     | `false`       | Faint placeholder for input.               |
+| `--input-placeholder-faint`     | `true`        | Faint placeholder for input.               |
 
 #### Cursor
 

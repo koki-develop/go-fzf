@@ -5,6 +5,7 @@ import "github.com/charmbracelet/lipgloss"
 var (
 	defaultColor        = "#00ADD8"
 	defaultStylesOption = stylesOption{
+		prompt:           lipgloss.NewStyle(),
 		cursor:           lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
 		cursorLine:       lipgloss.NewStyle().Bold(true),
 		matches:          lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
@@ -65,6 +66,7 @@ func (s *Style) lipgloss() lipgloss.Style {
 type StylesOption func(o *stylesOption)
 
 type stylesOption struct {
+	prompt           lipgloss.Style
 	cursor           lipgloss.Style
 	cursorLine       lipgloss.Style
 	selectedPrefix   lipgloss.Style
@@ -79,6 +81,13 @@ func NewStyles(opts ...StylesOption) *Styles {
 		opt(&o)
 	}
 	return &Styles{option: &o}
+}
+
+// WithStylePrompt sets the style of prompt.
+func WithStylePrompt(s Style) StylesOption {
+	return func(o *stylesOption) {
+		o.prompt = s.lipgloss()
+	}
 }
 
 // WithStyleCursor sets the style of cursor.

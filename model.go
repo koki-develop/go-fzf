@@ -51,6 +51,7 @@ type model struct {
 func newModel(opt *option) *model {
 	input := textinput.New()
 	input.Prompt = opt.prompt
+	input.PromptStyle = opt.styles.option.prompt
 	input.Placeholder = opt.inputPlaceholder
 	input.Focus()
 

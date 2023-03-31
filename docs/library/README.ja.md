@@ -244,12 +244,13 @@ if err != nil {
 f, err := fzf.New(
   fzf.WithNoLimit(true),
   fzf.WithStyles(
-    fzf.WithStylePrompt(fzf.Style{Faint: true}),                        // プロンプト
-    fzf.WithStyleCursor(fzf.Style{Bold: true}),                         // カーソル
-    fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                     // カーソル行
-    fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),        // 一致文字
-    fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: "#ff0000"}), // 選択中アイテムの接頭辞
-    fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),              // 未選択のアイテムの接頭辞
+    fzf.WithStylePrompt(fzf.Style{Faint: true}),                                       // プロンプト
+    fzf.WithStyleInputPlaceholder(fzf.Style{Faint: true, ForegroundColor: "#ff0000"}), // インプットのプレースホルダ
+    fzf.WithStyleCursor(fzf.Style{Bold: true}),                                        // カーソル
+    fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                                    // カーソル行
+    fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),                       // 一致文字
+    fzf.WithStyleSelectedPrefix(fzf.Style{ForegroundColor: "#ff0000"}),                // 選択中アイテムの接頭辞
+    fzf.WithStyleUnselectedPrefix(fzf.Style{Faint: true}),                             // 未選択のアイテムの接頭辞
   ),
 )
 if err != nil {

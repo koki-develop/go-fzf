@@ -54,6 +54,15 @@ var (
 	flagInputPlaceholderUnderline     bool
 	flagInputPlaceholderFaint         bool
 
+	flagInputTextFg            string
+	flagInputTextBg            string
+	flagInputTextBold          bool
+	flagInputTextBlink         bool
+	flagInputTextItalic        bool
+	flagInputTextStrikethrough bool
+	flagInputTextUnderline     bool
+	flagInputTextFaint         bool
+
 	flagCursorFg            string
 	flagCursorBg            string
 	flagCursorBold          bool
@@ -142,6 +151,16 @@ var rootCmd = &cobra.Command{
 					Strikethrough:   flagInputPlaceholderStrikethrough,
 					Underline:       flagInputPlaceholderUnderline,
 					Faint:           flagInputPlaceholderFaint,
+				}),
+				fzf.WithStyleInputText(fzf.Style{
+					ForegroundColor: flagInputTextFg,
+					BackgroundColor: flagInputTextBg,
+					Bold:            flagInputTextBold,
+					Blink:           flagInputTextBlink,
+					Italic:          flagInputTextItalic,
+					Strikethrough:   flagInputTextStrikethrough,
+					Underline:       flagInputTextUnderline,
+					Faint:           flagInputTextFaint,
 				}),
 				fzf.WithStyleCursor(fzf.Style{
 					ForegroundColor: flagCursorFg,
@@ -340,6 +359,15 @@ func init() {
 	rootCmd.Flags().BoolVar(&flagInputPlaceholderStrikethrough, "input-placeholder-strike", false, "")
 	rootCmd.Flags().BoolVar(&flagInputPlaceholderUnderline, "input-placeholder-underline", false, "")
 	rootCmd.Flags().BoolVar(&flagInputPlaceholderFaint, "input-placeholder-faint", true, "")
+
+	rootCmd.Flags().StringVar(&flagInputTextFg, "input-text-fg", "", "")
+	rootCmd.Flags().StringVar(&flagInputTextBg, "input-text-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagInputTextBold, "input-text-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagInputTextBlink, "input-text-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagInputTextItalic, "input-text-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagInputTextStrikethrough, "input-text-strike", false, "")
+	rootCmd.Flags().BoolVar(&flagInputTextUnderline, "input-text-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagInputTextFaint, "input-text-faint", false, "")
 
 	rootCmd.Flags().StringVar(&flagCursorFg, "cursor-fg", mainColor, "")
 	rootCmd.Flags().StringVar(&flagCursorBg, "cursor-bg", "", "")

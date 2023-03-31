@@ -54,10 +54,10 @@ Setting the `--no-limit` flag allows unlimited item selection.
 The `gofzf` CLI allows for various visual customizations using flags.
 
 - [Prompt](#prompt)
+- [Placeholder for input](#placeholder-for-input)
 - [Cursor](#cursor)
 - [Cursor Line](#cursor-line)
 - [Prefix of selected/unselected items](#prefix-of-selectedunselected-items)
-- [Placeholder for input](#placeholder-for-input)
 - [Matched characters](#matched-characters)
 
 #### Prompt
@@ -73,6 +73,20 @@ The `gofzf` CLI allows for various visual customizations using flags.
 | `--prompt-strike`    | `false` | Strkethrough prompt.        |
 | `--prompt-underline` | `false` | Underline prompt.           |
 | `--prompt-faint`     | `false` | Faint prompt.               |
+
+#### Placeholder for input
+
+| Flag                            | Default       | Description                                |
+| ------------------------------- | ------------- | ------------------------------------------ |
+| `--input-placeholder`           | `"Filter..."` | Placeholder for input.                     |
+| `--input-placeholder-fg`        | N/A           | Foreground color of placeholder for input. |
+| `--input-placeholder-bg`        | N/A           | Background color of placeholder for input. |
+| `--input-placeholder-bold`      | `false`       | Bold placeholder for input.                |
+| `--input-placeholder-blink`     | `false`       | Blink placeholder for input.               |
+| `--input-placeholder-italic`    | `false`       | Italicize placeholder for input.           |
+| `--input-placeholder-strike`    | `false`       | Strkethrough placeholder for input.        |
+| `--input-placeholder-underline` | `false`       | Underline placeholder for input.           |
+| `--input-placeholder-faint`     | `false`       | Faint placeholder for input.               |
 
 #### Cursor
 
@@ -126,12 +140,6 @@ The `gofzf` CLI allows for various visual customizations using flags.
 | `--unselected-prefix-strike`    | `false` | Strkethrough prefix of unselected items.        |
 | `--unselected-prefix-underline` | `false` | Underline prefix of unselected items.           |
 | `--unselected-prefix-faint`     | `true`  | Faint prefix of unselected items.               |
-
-#### Placeholder for input
-
-| Flag                  | Default       | Description            |
-| --------------------- | ------------- | ---------------------- |
-| `--input-placeholder` | `"Filter..."` | Placeholder for input. |
 
 #### Matched characters
 

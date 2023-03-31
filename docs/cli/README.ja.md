@@ -54,17 +54,39 @@ $ go install github.com/koki-develop/go-fzf/cmd/gofzf@latest
 `gofzf` CLI はフラグを使用して様々な見た目のカスタマイズができます。
 
 - [プロンプト](#プロンプト)
+- [インプットのプレースホルダ](#インプットのプレースホルダ)
 - [カーソル](#カーソル)
 - [カーソル行](#カーソル行)
 - [選択中 / 未選択アイテムの接頭辞](#選択中--未選択アイテムの接頭辞)
-- [インプットのプレースホルダ](#インプットのプレースホルダ)
 - [一致文字](#一致文字)
 
 #### プロンプト
 
-| フラグ     | デフォルト | 説明                 |
-| ---------- | ---------- | -------------------- |
-| `--prompt` | `"> "`     | プロンプトの文字列。 |
+| フラグ               | デフォルト | 説明                             |
+| -------------------- | ---------- | -------------------------------- |
+| `--prompt`           | `"> "`     | プロンプトの文字列。             |
+| `--prompt-fg`        | N/A        | プロンプトの文字色。             |
+| `--prompt-bg`        | N/A        | プロンプトの背景色。             |
+| `--prompt-bold`      | `false`    | プロンプトを太字にする。         |
+| `--prompt-blink`     | `false`    | プロンプトを点滅させる。         |
+| `--prompt-italic`    | `false`    | プロンプトをイタリック体にする。 |
+| `--prompt-strike`    | `false`    | プロンプトに取り消し線を引く。   |
+| `--prompt-underline` | `false`    | プロンプトに下線を引く。         |
+| `--prompt-faint`     | `false`    | プロンプトを薄く表示する。       |
+
+#### インプットのプレースホルダ
+
+| フラグ                          | デフォルト    | 説明                                             |
+| ------------------------------- | ------------- | ------------------------------------------------ |
+| `--input-placeholder`           | `"Filter..."` | インプットのプレースホルダ。                     |
+| `--input-placeholder-fg`        | N/A           | インプットのプレースホルダの文字色。             |
+| `--input-placeholder-bg`        | N/A           | インプットのプレースホルダの背景色。             |
+| `--input-placeholder-bold`      | `false`       | インプットのプレースホルダを太字にする。         |
+| `--input-placeholder-blink`     | `false`       | インプットのプレースホルダを点滅させる。         |
+| `--input-placeholder-italic`    | `false`       | インプットのプレースホルダをイタリック体にする。 |
+| `--input-placeholder-strike`    | `false`       | インプットのプレースホルダに取り消し線を引く。   |
+| `--input-placeholder-underline` | `false`       | インプットのプレースホルダに下線を引く。         |
+| `--input-placeholder-faint`     | `true`        | インプットのプレースホルダを薄く表示する。       |
 
 #### カーソル
 
@@ -118,12 +140,6 @@ $ go install github.com/koki-develop/go-fzf/cmd/gofzf@latest
 | `--unselected-prefix-strike`    | `false`    | 未選択アイテムの接頭辞に取り消し線を引く。   |
 | `--unselected-prefix-underline` | `false`    | 未選択アイテムの接頭辞に下線を引く。         |
 | `--unselected-prefix-faint`     | `true`     | 未選択アイテムの接頭辞を薄く表示する。       |
-
-#### インプットのプレースホルダ
-
-| フラグ                | デフォルト    | 説明                         |
-| --------------------- | ------------- | ---------------------------- |
-| `--input-placeholder` | `"Filter..."` | インプットのプレースホルダ。 |
 
 #### 一致文字
 

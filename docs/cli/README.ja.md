@@ -55,6 +55,7 @@ $ go install github.com/koki-develop/go-fzf/cmd/gofzf@latest
 
 - [プロンプト](#プロンプト)
 - [インプットのプレースホルダ](#インプットのプレースホルダ)
+- [インプットのテキスト](#インプットのテキスト)
 - [カーソル](#カーソル)
 - [カーソル行](#カーソル行)
 - [選択中 / 未選択アイテムの接頭辞](#選択中--未選択アイテムの接頭辞)
@@ -87,6 +88,19 @@ $ go install github.com/koki-develop/go-fzf/cmd/gofzf@latest
 | `--input-placeholder-strike`    | `false`       | インプットのプレースホルダに取り消し線を引く。   |
 | `--input-placeholder-underline` | `false`       | インプットのプレースホルダに下線を引く。         |
 | `--input-placeholder-faint`     | `true`        | インプットのプレースホルダを薄く表示する。       |
+
+#### インプットのテキスト
+
+| フラグ                          | デフォルト | 説明                                       |
+| ------------------------------- | ---------- | ------------------------------------------ |
+| `--input-placeholder-fg`        | N/A        | インプットのテキストの文字色。             |
+| `--input-placeholder-bg`        | N/A        | インプットのテキストの背景色。             |
+| `--input-placeholder-bold`      | `false`    | インプットのテキストを太字にする。         |
+| `--input-placeholder-blink`     | `false`    | インプットのテキストを点滅させる。         |
+| `--input-placeholder-italic`    | `false`    | インプットのテキストをイタリック体にする。 |
+| `--input-placeholder-strike`    | `false`    | インプットのテキストに取り消し線を引く。   |
+| `--input-placeholder-underline` | `false`    | インプットのテキストに下線を引く。         |
+| `--input-placeholder-faint`     | `false`    | インプットのテキストを薄く表示する。       |
 
 #### カーソル
 

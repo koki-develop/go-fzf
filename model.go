@@ -54,6 +54,7 @@ func newModel(opt *option) *model {
 	input.PromptStyle = opt.styles.option.prompt
 	input.Placeholder = opt.inputPlaceholder
 	input.PlaceholderStyle = opt.styles.option.inputPlaceholder
+	input.TextStyle = opt.styles.option.inputText
 	input.Focus()
 
 	if !opt.multiple() {

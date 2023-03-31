@@ -246,6 +246,7 @@ f, err := fzf.New(
   fzf.WithStyles(
     fzf.WithStylePrompt(fzf.Style{Faint: true}),                                       // プロンプト
     fzf.WithStyleInputPlaceholder(fzf.Style{Faint: true, ForegroundColor: "#ff0000"}), // インプットのプレースホルダ
+    fzf.WithStyleInputText(fzf.Style{Italic: true}),                                   // インプットのテキスト
     fzf.WithStyleCursor(fzf.Style{Bold: true}),                                        // カーソル
     fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                                    // カーソル行
     fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),                       // 一致文字

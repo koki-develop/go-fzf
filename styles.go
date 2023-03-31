@@ -7,6 +7,7 @@ var (
 	defaultStylesOption = stylesOption{
 		prompt:           lipgloss.NewStyle(),
 		inputPlaceholder: lipgloss.NewStyle().Faint(true),
+		inputText:        lipgloss.NewStyle(),
 		cursor:           lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
 		cursorLine:       lipgloss.NewStyle().Bold(true),
 		matches:          lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
@@ -69,6 +70,7 @@ type StylesOption func(o *stylesOption)
 type stylesOption struct {
 	prompt           lipgloss.Style
 	inputPlaceholder lipgloss.Style
+	inputText        lipgloss.Style
 	cursor           lipgloss.Style
 	cursorLine       lipgloss.Style
 	selectedPrefix   lipgloss.Style
@@ -92,10 +94,17 @@ func WithStylePrompt(s Style) StylesOption {
 	}
 }
 
-// WithInputPlaceholder sets the placeholder for input.
+// WithInputPlaceholder sets the style of placeholder for input.
 func WithStyleInputPlaceholder(s Style) StylesOption {
 	return func(o *stylesOption) {
 		o.inputPlaceholder = s.lipgloss()
+	}
+}
+
+// WithStyleInputText sets the style of input text.
+func WithStyleInputText(s Style) StylesOption {
+	return func(o *stylesOption) {
+		o.inputText = s.lipgloss()
 	}
 }
 

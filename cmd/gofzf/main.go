@@ -36,6 +36,15 @@ var (
 
 	flagCountView bool
 
+	flagPromptFg            string
+	flagPromptBg            string
+	flagPromptBold          bool
+	flagPromptBlink         bool
+	flagPromptItalic        bool
+	flagPromptStrikethrough bool
+	flagPromptUnderline     bool
+	flagPromptFaint         bool
+
 	flagCursorFg            string
 	flagCursorBg            string
 	flagCursorBold          bool
@@ -105,6 +114,16 @@ var rootCmd = &cobra.Command{
 			fzf.WithCountViewEnabled(flagCountView),
 
 			fzf.WithStyles(
+				fzf.WithStylePrompt(fzf.Style{
+					ForegroundColor: flagPromptFg,
+					BackgroundColor: flagPromptBg,
+					Bold:            flagPromptBold,
+					Blink:           flagPromptBlink,
+					Italic:          flagPromptItalic,
+					Strikethrough:   flagPromptStrikethrough,
+					Underline:       flagPromptUnderline,
+					Faint:           flagPromptFaint,
+				}),
 				fzf.WithStyleCursor(fzf.Style{
 					ForegroundColor: flagCursorFg,
 					BackgroundColor: flagCursorBg,
@@ -284,6 +303,15 @@ func init() {
 	rootCmd.Flags().StringVar(&flagInputPlaceholder, "input-placeholder", "Filter...", "")
 
 	rootCmd.Flags().BoolVar(&flagCountView, "count-view", true, "")
+
+	rootCmd.Flags().StringVar(&flagPromptFg, "prompt-fg", "", "")
+	rootCmd.Flags().StringVar(&flagPromptBg, "prompt-bg", "", "")
+	rootCmd.Flags().BoolVar(&flagPromptBold, "prompt-bold", false, "")
+	rootCmd.Flags().BoolVar(&flagPromptBlink, "prompt-blink", false, "")
+	rootCmd.Flags().BoolVar(&flagPromptItalic, "prompt-italic", false, "")
+	rootCmd.Flags().BoolVar(&flagPromptStrikethrough, "prompt-strike", false, "")
+	rootCmd.Flags().BoolVar(&flagPromptUnderline, "prompt-underline", false, "")
+	rootCmd.Flags().BoolVar(&flagPromptFaint, "prompt-faint", false, "")
 
 	rootCmd.Flags().StringVar(&flagCursorFg, "cursor-fg", mainColor, "")
 	rootCmd.Flags().StringVar(&flagCursorBg, "cursor-bg", "", "")

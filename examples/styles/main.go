@@ -13,6 +13,7 @@ func main() {
 	f, err := fzf.New(
 		fzf.WithNoLimit(true),
 		fzf.WithStyles(
+			fzf.WithStylePrompt(fzf.Style{Faint: true}),                        // Prompt
 			fzf.WithStyleCursor(fzf.Style{Bold: true}),                         // Cursor
 			fzf.WithStyleCursorLine(fzf.Style{Bold: true}),                     // Cursor line
 			fzf.WithStyleMatches(fzf.Style{ForegroundColor: "#ff0000"}),        // Matched characters

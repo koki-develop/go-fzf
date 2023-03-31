@@ -3,12 +3,13 @@ package fzf
 import "github.com/charmbracelet/lipgloss"
 
 var (
+	defaultColor        = "#00ADD8"
 	defaultStylesOption = stylesOption{
-		cursor:           lipgloss.NewStyle(),
-		cursorLine:       lipgloss.NewStyle(),
-		matches:          lipgloss.NewStyle(),
-		selectedPrefix:   lipgloss.NewStyle(),
-		unselectedPrefix: lipgloss.NewStyle(),
+		cursor:           lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
+		cursorLine:       lipgloss.NewStyle().Bold(true),
+		matches:          lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
+		selectedPrefix:   lipgloss.NewStyle().Foreground(lipgloss.Color(defaultColor)),
+		unselectedPrefix: lipgloss.NewStyle().Faint(true),
 	}
 )
 

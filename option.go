@@ -221,7 +221,7 @@ func WithCaseSensitive(s bool) Option {
 	}
 }
 
-// WithInputPosition sets the position of the input.
+// WithInputPosition sets the position of input.
 func WithInputPosition(p InputPosition) Option {
 	return func(o *option) {
 		o.inputPosition = p

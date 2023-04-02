@@ -54,6 +54,7 @@ Setting the `--no-limit` flag allows unlimited item selection.
 The `gofzf` CLI allows for various visual customizations using flags.
 
 - [Prompt](#prompt)
+- [Position of input](#position-of-input)
 - [Placeholder for input](#placeholder-for-input)
 - [Input text](#input-text)
 - [Cursor](#cursor)
@@ -74,6 +75,12 @@ The `gofzf` CLI allows for various visual customizations using flags.
 | `--prompt-strike`    | `false` | Strkethrough prompt.        |
 | `--prompt-underline` | `false` | Underline prompt.           |
 | `--prompt-faint`     | `false` | Faint prompt.               |
+
+#### Position of input
+
+| Flag               | Default | Description                                           |
+| ------------------ | ------- | ----------------------------------------------------- |
+| `--input-position` | `"top"` | Position of input. Either `top` or `bottom` is valid. |
 
 #### Placeholder for input
 

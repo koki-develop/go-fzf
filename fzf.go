@@ -29,6 +29,10 @@ func New(opts ...Option) (*FZF, error) {
 		return nil, errors.New("limit must be at least 1")
 	}
 
+	if err := o.inputPosition.Valid(); err != nil {
+		return nil, err
+	}
+
 	m := newModel(&o)
 
 	return &FZF{

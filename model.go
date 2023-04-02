@@ -125,94 +125,143 @@ func (m *model) View() string {
 
 	var v strings.Builder
 
-	_, _ = v.WriteString(m.headerView())
-	_, _ = v.WriteRune('\n')
-	_, _ = v.WriteString(m.itemsView())
+	var windowStyle lipgloss.Style
+	switch m.option.inputPosition {
+	case InputPositionTop:
+		windowStyle = lipgloss.NewStyle().Height(m.windowHeight).AlignVertical(lipgloss.Top)
+		_, _ = v.WriteString(m.inputView())
+		_, _ = v.WriteRune('\n')
+		_, _ = v.WriteString(m.itemsView())
 
-	return v.String()
+	case InputPositionBottom:
+		windowStyle = lipgloss.NewStyle().Height(m.windowHeight).AlignVertical(lipgloss.Bottom)
+		_, _ = v.WriteString(m.itemsView())
+		_, _ = v.WriteRune('\n')
+		_, _ = v.WriteString(m.inputView())
+	}
+
+	return windowStyle.Render(v.String())
 }
 
-func (m *model) headerView() string {
+func (m *model) inputView() string {
 	var v strings.Builder
 
-	// input
-	_, _ = v.WriteString(m.input.View())
-	// count
-	if m.option.countViewEnabled {
-		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
-			ItemsCount:    m.items.Len(),
-			MatchesCount:  len(m.matches),
-			SelectedCount: len(m.choices),
-			WindowWidth:   m.windowWidth,
-			Limit:         m.option.limit,
-			NoLimit:       m.option.noLimit,
-		}))
+	switch m.option.inputPosition {
+	case InputPositionTop:
+		// input
+		_, _ = v.WriteString(m.input.View())
+		// count
+		if m.option.countViewEnabled {
+			_, _ = v.WriteRune('\n')
+			_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
+				ItemsCount:    m.items.Len(),
+				MatchesCount:  len(m.matches),
+				SelectedCount: len(m.choices),
+				WindowWidth:   m.windowWidth,
+				Limit:         m.option.limit,
+				NoLimit:       m.option.noLimit,
+			}))
+		}
+
+	case InputPositionBottom:
+		// count
+		if m.option.countViewEnabled {
+			_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
+				ItemsCount:    m.items.Len(),
+				MatchesCount:  len(m.matches),
+				SelectedCount: len(m.choices),
+				WindowWidth:   m.windowWidth,
+				Limit:         m.option.limit,
+				NoLimit:       m.option.noLimit,
+			}))
+			_, _ = v.WriteRune('\n')
+		}
+		// input
+		_, _ = v.WriteString(m.input.View())
 	}
 
 	return v.String()
 }
 
-func (m *model) headerHeight() int {
-	return lipgloss.Height(m.headerView())
+func (m *model) inputHeight() int {
+	return lipgloss.Height(m.inputView())
 }
 
 func (m *model) itemsView() string {
 	var v strings.Builder
 
-	headerHeight := m.headerHeight()
+	inputHeight := m.inputHeight()
 
-	for i, match := range m.matches {
-		if i < m.windowYPosition {
-			continue
-		}
-
-		cursorLine := m.cursorPosition == i
-
-		// write cursor
-		if cursorLine {
-			_, _ = v.WriteString(m.cursor)
-		} else {
-			_, _ = v.WriteString(m.nocursor)
-		}
-
-		// write toggle
-		if m.option.multiple() {
-			if intContains(m.choices, match.Index) {
-				_, _ = v.WriteString(m.selectedPrefix)
-			} else {
-				_, _ = v.WriteString(m.unselectedPrefix)
+	switch m.option.inputPosition {
+	case InputPositionTop:
+		for i, match := range m.matches {
+			if i < m.windowYPosition {
+				continue
 			}
-		}
 
-		// write item prefix
-		if m.findOption.itemPrefixFunc != nil {
-			_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
-		}
-
-		// write item
-		for ci, c := range match.Str {
-			// matches
-			if intContains(match.MatchedIndexes, ci) {
-				if cursorLine {
-					_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
-				} else {
-					_, _ = v.WriteString(m.matchesStyle.Render(string(c)))
-				}
-			} else if cursorLine {
-				_, _ = v.WriteString(m.cursorLineStyle.Render(string(c)))
-			} else {
-				_, _ = v.WriteRune(c)
+			cursorLine := m.cursorPosition == i
+			m.writeItem(&v, match, cursorLine)
+			if i+1-m.windowYPosition >= m.windowHeight-inputHeight {
+				break
 			}
+			v.WriteRune('\n')
 		}
+	case InputPositionBottom:
+		for i := len(m.matches) - 1; i >= 0; i-- {
+			if len(m.matches)-i+m.windowHeight-inputHeight < m.windowYPosition {
+				continue
+			}
 
-		if i+1-m.windowYPosition >= m.windowHeight-headerHeight {
-			break
+			match := m.matches[i]
+			cursorLine := m.cursorPosition == i
+			m.writeItem(&v, match, cursorLine)
+			if i-1 < m.windowYPosition {
+				break
+			}
+			v.WriteRune('\n')
 		}
-		v.WriteString("\n")
 	}
 
 	return v.String()
+}
+
+func (m *model) writeItem(v *strings.Builder, match Match, cursorLine bool) {
+	// write cursor
+	if cursorLine {
+		_, _ = v.WriteString(m.cursor)
+	} else {
+		_, _ = v.WriteString(m.nocursor)
+	}
+
+	// write toggle
+	if m.option.multiple() {
+		if intContains(m.choices, match.Index) {
+			_, _ = v.WriteString(m.selectedPrefix)
+		} else {
+			_, _ = v.WriteString(m.unselectedPrefix)
+		}
+	}
+
+	// write item prefix
+	if m.findOption.itemPrefixFunc != nil {
+		_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
+	}
+
+	// write item
+	for ci, c := range match.Str {
+		// matches
+		if intContains(match.MatchedIndexes, ci) {
+			if cursorLine {
+				_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
+			} else {
+				_, _ = v.WriteString(m.matchesStyle.Render(string(c)))
+			}
+		} else if cursorLine {
+			_, _ = v.WriteString(m.cursorLineStyle.Render(string(c)))
+		} else {
+			_, _ = v.WriteRune(c)
+		}
+	}
 }
 
 /*
@@ -245,12 +294,22 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.toggle()
 		case key.Matches(msg, m.option.keymap.Up):
 			// up
-			m.cursorUp()
+			switch m.option.inputPosition {
+			case InputPositionTop:
+				m.cursorUp()
+			case InputPositionBottom:
+				m.cursorDown()
+			}
 			m.fixYPosition()
 			m.fixCursor()
 		case key.Matches(msg, m.option.keymap.Down):
 			// down
-			m.cursorDown()
+			switch m.option.inputPosition {
+			case InputPositionTop:
+				m.cursorDown()
+			case InputPositionBottom:
+				m.cursorUp()
+			}
 			m.fixYPosition()
 			m.fixCursor()
 		}
@@ -355,9 +414,9 @@ func (m *model) fixCursor() {
 }
 
 func (m *model) fixYPosition() {
-	headerHeight := m.headerHeight()
+	inputHeight := m.inputHeight()
 
-	if m.windowHeight-headerHeight > len(m.matches) {
+	if m.windowHeight-inputHeight > len(m.matches) {
 		m.windowYPosition = 0
 		return
 	}
@@ -367,8 +426,8 @@ func (m *model) fixYPosition() {
 		return
 	}
 
-	if m.cursorPosition+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
-		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-headerHeight), 0)
+	if m.cursorPosition+1 >= (m.windowHeight-inputHeight)+m.windowYPosition {
+		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-inputHeight), 0)
 		return
 	}
 }

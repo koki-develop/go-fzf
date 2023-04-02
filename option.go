@@ -1,6 +1,7 @@
 package fzf
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 	"sync"
@@ -27,6 +28,8 @@ var defaultOption = option{
 		Choose: key.NewBinding(key.WithKeys("enter")),
 		Abort:  key.NewBinding(key.WithKeys("ctrl+c", "esc")),
 	},
+
+	inputPosition: InputPositionTop,
 
 	countViewEnabled: true,
 	countViewFunc: func(meta CountViewMeta) string {
@@ -66,6 +69,24 @@ type CountViewMeta struct {
 	NoLimit       bool
 }
 
+// InputPosition represents the position of input.
+type InputPosition string
+
+const (
+	InputPositionTop    InputPosition = "top"
+	InputPositionBottom InputPosition = "bottom"
+)
+
+// Valid validates the value of InputPosition.
+func (p InputPosition) Valid() error {
+	switch p {
+	case InputPositionTop, InputPositionBottom:
+		return nil
+	default:
+		return fmt.Errorf("invalid input position: %s", p)
+	}
+}
+
 type option struct {
 	limit         int
 	noLimit       bool
@@ -79,6 +100,8 @@ type option struct {
 	styles           *Styles
 
 	keymap *keymap
+
+	inputPosition InputPosition
 
 	countViewEnabled bool
 	countViewFunc    func(meta CountViewMeta) string
@@ -195,5 +218,12 @@ func WithHotReload(locker sync.Locker) Option {
 func WithCaseSensitive(s bool) Option {
 	return func(o *option) {
 		o.caseSensitive = s
+	}
+}
+
+// WithInputPosition sets the position of input.
+func WithInputPosition(p InputPosition) Option {
+	return func(o *option) {
+		o.inputPosition = p
 	}
 }

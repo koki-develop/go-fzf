@@ -155,6 +155,7 @@ if err != nil {
 - [Prompt](#prompt)
 - [Cursor](#cursor)
 - [Prefix of selected/unselected items](#prefix-of-selectedunselected-items)
+- [Position of input](#position-of-input)
 - [Placeholder for input](#placeholder-for-input)
 - [Count View](#count-view)
 - [Styles](#styles)
@@ -202,6 +203,21 @@ if err != nil {
 ```
 
 [Example](/examples/prefix/)
+
+#### Position of input
+
+`fzf.WithInputPosition()` can be used to set the position of input.
+
+```go
+f, err := fzf.New(
+  fzf.WithInputPosition(fzf.InputPositionBottom),
+)
+if err != nil {
+  // ...
+}
+```
+
+[Example](/examples/input-position/)
 
 #### Placeholder for input
 

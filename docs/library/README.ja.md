@@ -154,6 +154,7 @@ if err != nil {
 - [プロンプト](#プロンプト)
 - [カーソル](#カーソル)
 - [選択中 / 未選択アイテムの接頭辞](#選択中--未選択アイテムの接頭辞)
+- [インプットの位置](#インプットの位置)
 - [インプットのプレースホルダ](#インプットのプレースホルダ)
 - [カウントビュー](#カウントビュー)
 - [スタイル](#スタイル)
@@ -200,6 +201,21 @@ if err != nil {
 ```
 
 [Example](/examples/prefix/)
+
+#### インプットの位置
+
+`fzf.WithInputPosition()` を使用するとインプットの位置を設定できます。
+
+```go
+f, err := fzf.New(
+  fzf.WithInputPosition(fzf.InputPositionBottom),
+)
+if err != nil {
+  // ...
+}
+```
+
+[Example](/examples/input-position/)
 
 #### インプットのプレースホルダ
 

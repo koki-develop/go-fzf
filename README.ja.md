@@ -71,8 +71,11 @@ func main() {
 
 ![](./examples/basic/demo.gif)
 
-詳しい情報は[ドキュメント](./docs/library/README.ja.md)をご参照ください。  
-また、 [examples](./examples/) には go-fzf の使い方の様々なサンプルが用意されています。
+詳しい情報は[ドキュメント](./docs/library/README.ja.md)をご参照ください。
+
+#### 使用例
+
+[examples](./examples/) には go-fzf の使い方の様々な例が用意されています。
 
 ## ライセンス
 

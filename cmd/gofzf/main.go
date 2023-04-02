@@ -34,7 +34,8 @@ var (
 	flagSelectedPrefix   string
 	flagUnselectedPrefix string
 
-	flagCountView bool
+	flagInputPosition string
+	flagCountView     bool
 
 	flagPromptFg            string
 	flagPromptBg            string
@@ -128,6 +129,8 @@ var rootCmd = &cobra.Command{
 			fzf.WithCursor(flagCursor),
 			fzf.WithSelectedPrefix(flagSelectedPrefix),
 			fzf.WithUnselectedPrefix(flagUnselectedPrefix),
+
+			fzf.WithInputPosition(fzf.InputPosition(flagInputPosition)),
 
 			fzf.WithCountViewEnabled(flagCountView),
 
@@ -339,6 +342,8 @@ func init() {
 	rootCmd.Flags().StringVar(&flagCursor, "cursor", "> ", "")
 	rootCmd.Flags().StringVar(&flagSelectedPrefix, "selected-prefix", "● ", "")
 	rootCmd.Flags().StringVar(&flagUnselectedPrefix, "unselected-prefix", "◯ ", "")
+
+	rootCmd.Flags().StringVar(&flagInputPosition, "input-position", string(fzf.InputPositionTop), "position of input (top|bottom)")
 
 	rootCmd.Flags().BoolVar(&flagCountView, "count-view", true, "")
 

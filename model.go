@@ -125,14 +125,14 @@ func (m *model) View() string {
 
 	var v strings.Builder
 
-	_, _ = v.WriteString(m.headerView())
+	_, _ = v.WriteString(m.inputView())
 	_, _ = v.WriteRune('\n')
 	_, _ = v.WriteString(m.itemsView())
 
 	return v.String()
 }
 
-func (m *model) headerView() string {
+func (m *model) inputView() string {
 	var v strings.Builder
 
 	// input
@@ -153,14 +153,14 @@ func (m *model) headerView() string {
 	return v.String()
 }
 
-func (m *model) headerHeight() int {
-	return lipgloss.Height(m.headerView())
+func (m *model) inputHeight() int {
+	return lipgloss.Height(m.inputView())
 }
 
 func (m *model) itemsView() string {
 	var v strings.Builder
 
-	headerHeight := m.headerHeight()
+	inputHeight := m.inputHeight()
 
 	for i, match := range m.matches {
 		if i < m.windowYPosition {
@@ -206,7 +206,7 @@ func (m *model) itemsView() string {
 			}
 		}
 
-		if i+1-m.windowYPosition >= m.windowHeight-headerHeight {
+		if i+1-m.windowYPosition >= m.windowHeight-inputHeight {
 			break
 		}
 		v.WriteString("\n")
@@ -355,9 +355,9 @@ func (m *model) fixCursor() {
 }
 
 func (m *model) fixYPosition() {
-	headerHeight := m.headerHeight()
+	inputHeight := m.inputHeight()
 
-	if m.windowHeight-headerHeight > len(m.matches) {
+	if m.windowHeight-inputHeight > len(m.matches) {
 		m.windowYPosition = 0
 		return
 	}
@@ -367,8 +367,8 @@ func (m *model) fixYPosition() {
 		return
 	}
 
-	if m.cursorPosition+1 >= (m.windowHeight-headerHeight)+m.windowYPosition {
-		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-headerHeight), 0)
+	if m.cursorPosition+1 >= (m.windowHeight-inputHeight)+m.windowYPosition {
+		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-inputHeight), 0)
 		return
 	}
 }

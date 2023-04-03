@@ -103,28 +103,9 @@ func Search(items Items, search string, opts ...SearchOption) Matches {
 
 				// Perform the search for each item.
 				for index := start; index < end; index++ {
-					item := items.ItemString(index)
-
-					// If case-insensitive, convert the item to lowercase.
-					if !o.caseSensitive {
-						item = strings.ToLower(item)
-					}
-
-					// Create a slice to store the matched indexes.
-					matchedIndexes := make([]int, 0, len(search))
-					j := 0
-
-					// Check for matching between the item's characters and the search string.
-					for i, r := range item {
-						if j < len(search) && r == rune(search[j]) {
-							matchedIndexes = append(matchedIndexes, i)
-							j++
-						}
-					}
-
-					// If all characters in the search string match, add the match to the local matches.
-					if j == len(search) {
-						m := Match{Str: items.ItemString(index), Index: index, MatchedIndexes: matchedIndexes}
+					m, ok := fuzzySearch(items.ItemString(index), search, o)
+					if ok {
+						m.Index = index
 						localMatches = append(localMatches, m)
 					}
 				}
@@ -151,4 +132,32 @@ func Search(items Items, search string, opts ...SearchOption) Matches {
 	// Sort the search results and return them.
 	result.sort()
 	return result
+}
+
+func fuzzySearch(str, search string, o searchOption) (Match, bool) {
+	item := str
+
+	// If case-insensitive, convert the item to lowercase.
+	if !o.caseSensitive {
+		item = strings.ToLower(item)
+	}
+
+	// Create a slice to store the matched indexes.
+	matchedIndexes := make([]int, 0, len(search))
+	j := 0
+
+	// Check for matching between the item's characters and the search string.
+	for i, r := range item {
+		if j < len(search) && r == rune(search[j]) {
+			matchedIndexes = append(matchedIndexes, i)
+			j++
+		}
+	}
+
+	// Returns Match if all characters in the search string match.
+	if j == len(search) {
+		return Match{Str: str, MatchedIndexes: matchedIndexes}, true
+	} else {
+		return Match{}, false
+	}
 }

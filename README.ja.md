@@ -1,4 +1,4 @@
-<h1 align="center">go-fzf</h1>
+<h1 align="center">🔍 go-fzf</h1>
 
 <p align="center">
 <a href="https://pkg.go.dev/github.com/koki-develop/go-fzf"><img src="https://pkg.go.dev/badge/github.com/koki-develop/go-fzf.svg" alt="Go Reference"></a>

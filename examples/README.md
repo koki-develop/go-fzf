@@ -1,5 +1,7 @@
 # Examples
 
+English | [日本語](./README.ja.md)
+
 - [Basic](#basic)
 - [Select Multiple](#select-multiple)
 - [Case Sensitive/Insensitive](#case-sensitiveinsensitive)

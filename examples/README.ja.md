@@ -1,6 +1,6 @@
 # Examples
 
-[English](./README.md) | 日本語
+[English](./#readme) | 日本語
 
 - [基本](#基本)
 - [複数選択](#複数選択)

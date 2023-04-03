@@ -14,7 +14,7 @@ Fuzzy Finder CLI and Library.
 </p>
 
 <p align="center">
-<a href="./README.md">English</a> | 日本語
+<a href="https://github.com/koki-develop/go-fzf#readme">English</a> | 日本語
 </p>
 
 ## 目次

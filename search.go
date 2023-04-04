@@ -134,11 +134,11 @@ func Search(items Items, search string, opts ...SearchOption) Matches {
 	return result
 }
 
-func fuzzySearch(str, search string, o searchOption) (Match, bool) {
+func fuzzySearch(str, search string, option searchOption) (Match, bool) {
 	item := str
 
 	// If case-insensitive, convert the item to lowercase.
-	if !o.caseSensitive {
+	if !option.caseSensitive {
 		item = strings.ToLower(item)
 	}
 

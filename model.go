@@ -200,7 +200,7 @@ func (m *model) itemsView() string {
 			}
 
 			cursorLine := m.cursorPosition == i
-			m.writeItem(&v, match, cursorLine)
+			v.WriteString(m.itemView(match, cursorLine))
 			if i+1-m.windowYPosition >= m.windowHeight-inputHeight {
 				break
 			}
@@ -212,9 +212,8 @@ func (m *model) itemsView() string {
 				continue
 			}
 
-			match := m.matches[i]
 			cursorLine := m.cursorPosition == i
-			m.writeItem(&v, match, cursorLine)
+			v.WriteString(m.itemView(m.matches[i], cursorLine))
 			if i-1 < m.windowYPosition {
 				break
 			}
@@ -225,7 +224,9 @@ func (m *model) itemsView() string {
 	return v.String()
 }
 
-func (m *model) writeItem(v *strings.Builder, match Match, cursorLine bool) {
+func (m *model) itemView(match Match, cursorLine bool) string {
+	var v strings.Builder
+
 	// write cursor
 	if cursorLine {
 		_, _ = v.WriteString(m.cursor)
@@ -262,6 +263,8 @@ func (m *model) writeItem(v *strings.Builder, match Match, cursorLine bool) {
 			_, _ = v.WriteRune(c)
 		}
 	}
+
+	return v.String()
 }
 
 /*

@@ -187,6 +187,10 @@ func (m *model) inputHeight() int {
 	return lipgloss.Height(m.inputView())
 }
 
+func (m *model) itemsHeight() int {
+	return min(m.windowHeight-m.inputHeight(), len(m.matches))
+}
+
 func (m *model) itemsView() string {
 	var v strings.Builder
 

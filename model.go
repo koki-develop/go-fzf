@@ -187,45 +187,36 @@ func (m *model) inputHeight() int {
 	return lipgloss.Height(m.inputView())
 }
 
+func (m *model) itemsHeight() int {
+	return min(m.windowHeight-m.inputHeight(), len(m.matches))
+}
+
 func (m *model) itemsView() string {
-	var v strings.Builder
-
-	inputHeight := m.inputHeight()
-
+	itemsHeight := m.itemsHeight()
+	if itemsHeight < 1 {
+		return ""
+	}
+	matches := m.matches[m.windowYPosition : itemsHeight+m.windowYPosition]
+	rows := make([]string, len(matches))
 	switch m.option.inputPosition {
 	case InputPositionTop:
-		for i, match := range m.matches {
-			if i < m.windowYPosition {
-				continue
-			}
-
-			cursorLine := m.cursorPosition == i
-			m.writeItem(&v, match, cursorLine)
-			if i+1-m.windowYPosition >= m.windowHeight-inputHeight {
-				break
-			}
-			v.WriteRune('\n')
+		for i, match := range matches {
+			cursorLine := m.cursorPosition == (i + m.windowYPosition)
+			rows[i] = m.itemView(match, cursorLine)
 		}
 	case InputPositionBottom:
-		for i := len(m.matches) - 1; i >= 0; i-- {
-			if len(m.matches)-i+m.windowHeight-inputHeight < m.windowYPosition {
-				continue
-			}
-
-			match := m.matches[i]
-			cursorLine := m.cursorPosition == i
-			m.writeItem(&v, match, cursorLine)
-			if i-1 < m.windowYPosition {
-				break
-			}
-			v.WriteRune('\n')
+		for i, match := range matches {
+			cursorLine := m.cursorPosition == (i + m.windowYPosition)
+			rows[len(matches)-1-i] = m.itemView(match, cursorLine)
 		}
 	}
 
-	return v.String()
+	return strings.Join(rows, "\n")
 }
 
-func (m *model) writeItem(v *strings.Builder, match Match, cursorLine bool) {
+func (m *model) itemView(match Match, cursorLine bool) string {
+	var v strings.Builder
+
 	// write cursor
 	if cursorLine {
 		_, _ = v.WriteString(m.cursor)
@@ -262,6 +253,8 @@ func (m *model) writeItem(v *strings.Builder, match Match, cursorLine bool) {
 			_, _ = v.WriteRune(c)
 		}
 	}
+
+	return v.String()
 }
 
 /*

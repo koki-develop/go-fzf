@@ -36,3 +36,11 @@ func max(l, r int) int {
 		return l
 	}
 }
+
+func min(l, r int) int {
+	if l > r {
+		return r
+	} else {
+		return l
+	}
+}

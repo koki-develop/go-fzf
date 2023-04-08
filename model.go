@@ -239,7 +239,7 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 	}
 
 	// write item
-	for ci, c := range match.Str {
+	for ci, c := range []rune(match.Str) {
 		// matches
 		if intContains(match.MatchedIndexes, ci) {
 			if cursorLine {

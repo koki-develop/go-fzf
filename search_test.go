@@ -42,6 +42,18 @@ func Test_fuzzySearch(t *testing.T) {
 		{str: "abc", search: "d"},
 		{str: "abc", search: "abcd"},
 
+		{str: "こんにちは", search: "", matchedIndexes: []int{}},
+		{str: "こんにちは", search: "こ", matchedIndexes: []int{0}},
+		{str: "こんにちは", search: "こん", matchedIndexes: []int{0, 1}},
+		{str: "こんにちは", search: "こんに", matchedIndexes: []int{0, 1, 2}},
+		{str: "こんにちは", search: "こんにち", matchedIndexes: []int{0, 1, 2, 3}},
+		{str: "こんにちは", search: "こんにちは", matchedIndexes: []int{0, 1, 2, 3, 4}},
+		{str: "こんにちは", search: "ん", matchedIndexes: []int{1}},
+		{str: "こんにちは", search: "んに", matchedIndexes: []int{1, 2}},
+		{str: "こんにちは", search: "んにち", matchedIndexes: []int{1, 2, 3}},
+		{str: "こんにちは", search: "んにちは", matchedIndexes: []int{1, 2, 3, 4}},
+		{str: "こんにちは", search: "こには", matchedIndexes: []int{0, 2, 4}},
+
 		{str: "xaxbxc", search: "a", matchedIndexes: []int{1}},
 		{str: "xaxbxc", search: "ab", matchedIndexes: []int{1, 3}},
 		{str: "xaxbxc", search: "ac", matchedIndexes: []int{1, 5}},

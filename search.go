@@ -4,6 +4,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"unicode/utf8"
 )
 
 var (
@@ -143,19 +144,20 @@ func fuzzySearch(str, search string, option searchOption) (Match, bool) {
 	}
 
 	// Create a slice to store the matched indexes.
-	matchedIndexes := make([]int, 0, len(search))
+	matchedIndexes := make([]int, 0, utf8.RuneCountInString(search))
 	j := 0
 
 	// Check for matching between the item's characters and the search string.
-	for i, r := range item {
-		if j < len(search) && r == rune(search[j]) {
+	searchRunes := []rune(search)
+	for i, r := range []rune(item) {
+		if j < len(searchRunes) && r == searchRunes[j] {
 			matchedIndexes = append(matchedIndexes, i)
 			j++
 		}
 	}
 
 	// Returns Match if all characters in the search string match.
-	if j == len(search) {
+	if j == len(searchRunes) {
 		return Match{Str: str, MatchedIndexes: matchedIndexes}, true
 	} else {
 		return Match{}, false

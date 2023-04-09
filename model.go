@@ -261,19 +261,23 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 		}
 
 		if len(match.MatchedIndexes) == 0 {
+			// truncate end
 			to = maxItemWidth - len(ellipsis)
 		} else {
 			lastMatchedIndex := match.MatchedIndexes[len(match.MatchedIndexes)-1]
 
 			if lastMatchedIndex+2+len(ellipsis) < maxItemWidth {
+				// truncate end
 				to = maxItemWidth - len(ellipsis)
 			} else {
 				v.WriteString(m.ellipsisStyle.Render(ellipsis))
 
 				if lastMatchedIndex+1+2+len(ellipsis) < len(runes) {
+					// truncate both start and end
 					from = lastMatchedIndex + 1 - maxItemWidth + 2 + len(ellipsis)*2
 					to = from + maxItemWidth - len(ellipsis)*2
 				} else {
+					// truncate start
 					from = len(runes) - maxItemWidth + len(ellipsis)
 				}
 			}

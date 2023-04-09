@@ -35,6 +35,7 @@ type model struct {
 	matchesStyle           lipgloss.Style
 	cursorLineStyle        lipgloss.Style
 	cursorLineMatchesStyle lipgloss.Style
+	ellipsisStyle          lipgloss.Style
 
 	matches Matches
 	choices []int
@@ -78,6 +79,7 @@ func newModel(opt *option) *model {
 		matchesStyle:           opt.styles.option.matches,
 		cursorLineStyle:        opt.styles.option.cursorLine,
 		cursorLineMatchesStyle: lipgloss.NewStyle().Inherit(opt.styles.option.matches).Inherit(opt.styles.option.cursorLine),
+		ellipsisStyle:          lipgloss.NewStyle().Faint(true),
 
 		choices: []int{},
 		// window
@@ -238,10 +240,50 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 		_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
 	}
 
+	maxItemWidth := m.windowWidth - lipgloss.Width(v.String())
+	if maxItemWidth < 1 {
+		return v.String()
+	}
+
+	runes := []rune(match.Str)
+	from := 0
+	to := len(runes)
+	ellipsis := ".."
+
+	// truncate string
+	itemWidth := lipgloss.Width(match.Str)
+	if maxItemWidth < itemWidth {
+		if maxItemWidth <= len(ellipsis)*2 {
+			ellipsis = "."
+		}
+		if maxItemWidth <= len(ellipsis)*2 {
+			ellipsis = ""
+		}
+
+		if len(match.MatchedIndexes) == 0 {
+			to = maxItemWidth - len(ellipsis)
+		} else {
+			lastMatchedIndex := match.MatchedIndexes[len(match.MatchedIndexes)-1]
+
+			if lastMatchedIndex+2+len(ellipsis) < maxItemWidth {
+				to = maxItemWidth - len(ellipsis)
+			} else {
+				v.WriteString(m.ellipsisStyle.Render(ellipsis))
+
+				if lastMatchedIndex+1+2+len(ellipsis) < len(runes) {
+					from = lastMatchedIndex + 1 - maxItemWidth + 2 + len(ellipsis)*2
+					to = from + maxItemWidth - len(ellipsis)*2
+				} else {
+					from = len(runes) - maxItemWidth + len(ellipsis)
+				}
+			}
+		}
+	}
+
 	// write item
-	for ci, c := range []rune(match.Str) {
+	for ci, c := range runes[from:to] {
 		// matches
-		if intContains(match.MatchedIndexes, ci) {
+		if intContains(match.MatchedIndexes, ci+from) {
 			if cursorLine {
 				_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
 			} else {
@@ -252,6 +294,10 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 		} else {
 			_, _ = v.WriteRune(c)
 		}
+	}
+
+	if to != len(runes) {
+		v.WriteString(m.ellipsisStyle.Render(ellipsis))
 	}
 
 	return v.String()

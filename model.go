@@ -139,24 +139,21 @@ func (m *model) View() string {
 }
 
 func (m *model) mainView() string {
-	var v strings.Builder
+	rows := make([]string, 2)
 
-	var windowStyle lipgloss.Style
+	windowStyle := lipgloss.NewStyle().Height(m.windowHeight)
 	switch m.option.inputPosition {
 	case InputPositionTop:
-		windowStyle = lipgloss.NewStyle().Height(m.windowHeight).AlignVertical(lipgloss.Top)
-		_, _ = v.WriteString(m.inputView())
-		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.itemsView())
-
+		windowStyle = windowStyle.AlignVertical(lipgloss.Top)
+		rows[0] = m.inputView()
+		rows[1] = m.itemsView()
 	case InputPositionBottom:
-		windowStyle = lipgloss.NewStyle().Height(m.windowHeight).AlignVertical(lipgloss.Bottom)
-		_, _ = v.WriteString(m.itemsView())
-		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.inputView())
+		windowStyle = windowStyle.AlignVertical(lipgloss.Bottom)
+		rows[0] = m.itemsView()
+		rows[1] = m.inputView()
 	}
 
-	return windowStyle.Render(v.String())
+	return windowStyle.Render(strings.Join(rows, "\n"))
 }
 
 func (m *model) inputView() string {

@@ -214,7 +214,7 @@ func (m *model) itemsView() string {
 		}
 	}
 
-	return strings.Join(rows, "\n")
+	return lipgloss.JoinVertical(lipgloss.Left, rows...)
 }
 
 func (m *model) itemView(match Match, cursorLine bool) string {

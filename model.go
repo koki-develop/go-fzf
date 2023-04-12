@@ -315,7 +315,7 @@ func (m *model) previewWindowView() string {
 	}
 
 	return lipgloss.NewStyle().
-		Width(m.mainViewWidth).
+		Width(m.previewWindowWidth).
 		Height(m.windowHeight).
 		BorderStyle(lipgloss.NormalBorder()).
 		BorderLeft(true).

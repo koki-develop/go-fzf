@@ -9,7 +9,8 @@ import (
 )
 
 var defaultFindOption = findOption{
-	itemPrefixFunc: nil,
+	itemPrefixFunc:    nil,
+	previewWindowFunc: nil,
 }
 
 // Fuzzy Finder.
@@ -103,12 +104,20 @@ func (fzf *FZF) Abort() {
 type FindOption func(o *findOption)
 
 type findOption struct {
-	itemPrefixFunc func(i int) string
+	itemPrefixFunc    func(i int) string
+	previewWindowFunc func(i, width, height int) string
 }
 
 // WithItemPrefix sets the prefix function of the item.
 func WithItemPrefix(f func(i int) string) FindOption {
 	return func(o *findOption) {
 		o.itemPrefixFunc = f
+	}
+}
+
+// WithPreviewWindow sets the preview window function of the item.
+func WithPreviewWindow(f func(i, width, height int) string) FindOption {
+	return func(o *findOption) {
+		o.previewWindowFunc = f
 	}
 }

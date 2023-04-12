@@ -139,7 +139,7 @@ func (m *model) View() string {
 func (m *model) mainView() string {
 	rows := make([]string, 2)
 
-	windowStyle := lipgloss.NewStyle().Height(m.windowHeight)
+	windowStyle := lipgloss.NewStyle().Height(m.windowHeight).Width(m.mainViewWidth)
 	switch m.option.inputPosition {
 	case InputPositionTop:
 		windowStyle = windowStyle.AlignVertical(lipgloss.Top)

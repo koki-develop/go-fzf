@@ -128,9 +128,7 @@ func (m *model) View() string {
 		defer m.option.hotReloadLocker.Unlock()
 	}
 
-	views := []string{
-		m.mainView(),
-	}
+	views := []string{m.mainView()}
 	if m.findOption.previewWindowFunc != nil {
 		views = append(views, m.previewWindowView())
 	}
@@ -153,47 +151,39 @@ func (m *model) mainView() string {
 		rows[1] = m.inputView()
 	}
 
-	return windowStyle.Render(strings.Join(rows, "\n"))
+	return windowStyle.Render(lipgloss.JoinVertical(lipgloss.Left, rows...))
 }
 
 func (m *model) inputView() string {
-	var v strings.Builder
+	rows := []string{}
+
+	countView := ""
+	countViewEnabled := m.option.countViewEnabled && m.option.countViewFunc != nil
+	if countViewEnabled {
+		countView = m.option.countViewFunc(CountViewMeta{
+			ItemsCount:    m.items.Len(),
+			MatchesCount:  len(m.matches),
+			SelectedCount: len(m.choices),
+			WindowWidth:   m.mainViewWidth,
+			Limit:         m.option.limit,
+			NoLimit:       m.option.noLimit,
+		})
+	}
 
 	switch m.option.inputPosition {
 	case InputPositionTop:
-		// input
-		_, _ = v.WriteString(m.input.View())
-		// count
-		if m.option.countViewEnabled {
-			_, _ = v.WriteRune('\n')
-			_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
-				ItemsCount:    m.items.Len(),
-				MatchesCount:  len(m.matches),
-				SelectedCount: len(m.choices),
-				WindowWidth:   m.mainViewWidth,
-				Limit:         m.option.limit,
-				NoLimit:       m.option.noLimit,
-			}))
+		rows = append(rows, m.input.View())
+		if countViewEnabled {
+			rows = append(rows, countView)
 		}
-
 	case InputPositionBottom:
-		// count
-		if m.option.countViewEnabled {
-			_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
-				ItemsCount:    m.items.Len(),
-				MatchesCount:  len(m.matches),
-				SelectedCount: len(m.choices),
-				WindowWidth:   m.mainViewWidth,
-				Limit:         m.option.limit,
-				NoLimit:       m.option.noLimit,
-			}))
-			_, _ = v.WriteRune('\n')
+		if countViewEnabled {
+			rows = append(rows, countView)
 		}
-		// input
-		_, _ = v.WriteString(m.input.View())
+		rows = append(rows, m.input.View())
 	}
 
-	return v.String()
+	return lipgloss.JoinVertical(lipgloss.Left, rows...)
 }
 
 func (m *model) inputHeight() int {

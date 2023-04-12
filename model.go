@@ -395,9 +395,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 	if beforeValue != m.input.Value() {
-		m.filter()
-		m.fixYPosition()
-		m.fixCursor()
+		if len(m.matches) > 0 || !strings.HasPrefix(m.input.Value(), beforeValue) {
+			m.filter()
+			m.fixYPosition()
+			m.fixCursor()
+		}
 	}
 
 	return m, tea.Batch(cmds...)

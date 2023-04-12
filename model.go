@@ -164,7 +164,7 @@ func (m *model) inputView() string {
 			ItemsCount:    m.items.Len(),
 			MatchesCount:  len(m.matches),
 			SelectedCount: len(m.choices),
-			WindowWidth:   m.mainViewWidth,
+			Width:         m.mainViewWidth,
 			Limit:         m.option.limit,
 			NoLimit:       m.option.noLimit,
 		})

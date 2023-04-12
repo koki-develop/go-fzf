@@ -45,6 +45,9 @@ type model struct {
 	windowHeight    int
 	windowYPosition int
 
+	mainViewWidth      int
+	previewWindowWidth int
+
 	// components
 	input textinput.Model
 }
@@ -125,6 +128,17 @@ func (m *model) View() string {
 		defer m.option.hotReloadLocker.Unlock()
 	}
 
+	views := []string{
+		m.mainView(),
+	}
+	if m.findOption.previewWindowFunc != nil {
+		views = append(views, m.previewWindowView())
+	}
+
+	return lipgloss.JoinHorizontal(lipgloss.Top, views...)
+}
+
+func (m *model) mainView() string {
 	var v strings.Builder
 
 	var windowStyle lipgloss.Style
@@ -159,7 +173,7 @@ func (m *model) inputView() string {
 				ItemsCount:    m.items.Len(),
 				MatchesCount:  len(m.matches),
 				SelectedCount: len(m.choices),
-				WindowWidth:   m.windowWidth,
+				WindowWidth:   m.mainViewWidth,
 				Limit:         m.option.limit,
 				NoLimit:       m.option.noLimit,
 			}))
@@ -172,7 +186,7 @@ func (m *model) inputView() string {
 				ItemsCount:    m.items.Len(),
 				MatchesCount:  len(m.matches),
 				SelectedCount: len(m.choices),
-				WindowWidth:   m.windowWidth,
+				WindowWidth:   m.mainViewWidth,
 				Limit:         m.option.limit,
 				NoLimit:       m.option.noLimit,
 			}))
@@ -240,7 +254,7 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 		_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
 	}
 
-	maxItemWidth := m.windowWidth - lipgloss.Width(v.String())
+	maxItemWidth := m.mainViewWidth - lipgloss.Width(v.String())
 	if maxItemWidth < 1 {
 		return v.String()
 	}
@@ -307,6 +321,20 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 	return v.String()
 }
 
+func (m *model) previewWindowView() string {
+	v := ""
+	if len(m.matches) > 0 {
+		v = m.findOption.previewWindowFunc(m.matches[m.cursorPosition].Index, m.previewWindowWidth, m.windowHeight)
+	}
+
+	return lipgloss.NewStyle().
+		Width(m.mainViewWidth).
+		Height(m.windowHeight).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderLeft(true).
+		Render(v)
+}
+
 /*
  * update
  */
@@ -360,9 +388,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// window
 		m.windowWidth = msg.Width
 		m.windowHeight = msg.Height
-		m.input.Width = m.windowWidth - m.promptWidth
 		m.fixYPosition()
 		m.fixCursor()
+		m.fixWidth()
 	case watchReloadMsg:
 		// watch reload
 		return m, m.watchReload()
@@ -473,6 +501,15 @@ func (m *model) fixYPosition() {
 		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-inputHeight), 0)
 		return
 	}
+}
+
+func (m *model) fixWidth() {
+	m.mainViewWidth = m.windowWidth
+	if m.findOption.previewWindowFunc != nil {
+		m.mainViewWidth /= 2
+		m.previewWindowWidth = m.windowWidth - m.mainViewWidth
+	}
+	m.input.Width = m.mainViewWidth - m.promptWidth - 1
 }
 
 func (m *model) forceReload() {

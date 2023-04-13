@@ -52,7 +52,7 @@ var defaultOption = option{
 		if borderw < 0 {
 			borderw = 0
 		}
-		_, _ = v.WriteString(strings.Repeat("-", borderw))
+		_, _ = v.WriteString(strings.Repeat("─", borderw))
 		return v.String()
 	},
 

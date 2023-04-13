@@ -48,7 +48,7 @@ var defaultOption = option{
 			_, _ = v.WriteString(") ")
 		}
 
-		borderw := meta.WindowWidth - v.Len()
+		borderw := meta.Width - v.Len()
 		if borderw < 0 {
 			borderw = 0
 		}
@@ -64,7 +64,7 @@ type CountViewMeta struct {
 	ItemsCount    int
 	MatchesCount  int
 	SelectedCount int
-	WindowWidth   int
+	Width         int
 	Limit         int
 	NoLimit       bool
 }

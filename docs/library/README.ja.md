@@ -157,6 +157,7 @@ if err != nil {
 - [インプットの位置](#インプットの位置)
 - [インプットのプレースホルダ](#インプットのプレースホルダ)
 - [カウントビュー](#カウントビュー)
+- [プレビューウィンドウ](#プレビューウィンドウ)
 - [スタイル](#スタイル)
 
 #### プロンプト
@@ -250,6 +251,40 @@ if err != nil {
 ```
 
 [Example](/examples/countview/)
+
+#### プレビューウィンドウ
+
+`Find()` メソッドに `fzf.PreviewWindow()` 渡すとプレビューウィンドウをレンダリングする関数を設定することができます。  
+関数の引数にはカーソル行のアイテムのインデックスとプレビューウィンドウのサイズが渡されます。
+
+```go
+files, err := os.ReadDir(".")
+if err != nil {
+  // ...
+}
+
+f, err := fzf.New()
+if err != nil {
+  // ...
+}
+
+idxs, err := f.Find(
+  files,
+  func(i int) string { return files[i].Name() },
+  fzf.WithPreviewWindow(func(i, width, height int) string {
+    info, _ := files[i].Info()
+    return fmt.Sprintf(
+      "Name: %s\nModTime: %s\nSize: %d bytes",
+      info.Name(), info.ModTime(), info.Size(),
+    )
+  }),
+)
+if err != nil {
+  // ...
+}
+```
+
+[Example](/examples/preview-window/)
 
 #### スタイル
 

@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/mattn/go-runewidth"
 )
 
 var (
@@ -44,6 +45,9 @@ type model struct {
 	windowWidth     int
 	windowHeight    int
 	windowYPosition int
+
+	mainViewWidth      int
+	previewWindowWidth int
 
 	// components
 	input textinput.Model
@@ -102,6 +106,8 @@ func (m *model) setFindOption(findOption *findOption) {
 }
 
 func (m *model) Init() tea.Cmd {
+	runewidth.DefaultCondition.EastAsianWidth = false
+
 	cmds := []tea.Cmd{
 		textinput.Blink,
 		tea.EnterAltScreen,
@@ -125,64 +131,62 @@ func (m *model) View() string {
 		defer m.option.hotReloadLocker.Unlock()
 	}
 
-	var v strings.Builder
-
-	var windowStyle lipgloss.Style
-	switch m.option.inputPosition {
-	case InputPositionTop:
-		windowStyle = lipgloss.NewStyle().Height(m.windowHeight).AlignVertical(lipgloss.Top)
-		_, _ = v.WriteString(m.inputView())
-		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.itemsView())
-
-	case InputPositionBottom:
-		windowStyle = lipgloss.NewStyle().Height(m.windowHeight).AlignVertical(lipgloss.Bottom)
-		_, _ = v.WriteString(m.itemsView())
-		_, _ = v.WriteRune('\n')
-		_, _ = v.WriteString(m.inputView())
+	views := []string{m.mainView()}
+	if m.findOption.previewWindowFunc != nil {
+		views = append(views, m.previewWindowView())
 	}
 
-	return windowStyle.Render(v.String())
+	return lipgloss.JoinHorizontal(lipgloss.Top, views...)
+}
+
+func (m *model) mainView() string {
+	rows := make([]string, 2)
+
+	windowStyle := lipgloss.NewStyle().Height(m.windowHeight).Width(m.mainViewWidth)
+	switch m.option.inputPosition {
+	case InputPositionTop:
+		windowStyle = windowStyle.AlignVertical(lipgloss.Top)
+		rows[0] = m.inputView()
+		rows[1] = m.itemsView()
+	case InputPositionBottom:
+		windowStyle = windowStyle.AlignVertical(lipgloss.Bottom)
+		rows[0] = m.itemsView()
+		rows[1] = m.inputView()
+	}
+
+	return windowStyle.Render(lipgloss.JoinVertical(lipgloss.Left, rows...))
 }
 
 func (m *model) inputView() string {
-	var v strings.Builder
+	rows := []string{}
+
+	countView := ""
+	countViewEnabled := m.option.countViewEnabled && m.option.countViewFunc != nil
+	if countViewEnabled {
+		countView = m.option.countViewFunc(CountViewMeta{
+			ItemsCount:    m.items.Len(),
+			MatchesCount:  len(m.matches),
+			SelectedCount: len(m.choices),
+			Width:         m.mainViewWidth,
+			Limit:         m.option.limit,
+			NoLimit:       m.option.noLimit,
+		})
+	}
 
 	switch m.option.inputPosition {
 	case InputPositionTop:
-		// input
-		_, _ = v.WriteString(m.input.View())
-		// count
-		if m.option.countViewEnabled {
-			_, _ = v.WriteRune('\n')
-			_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
-				ItemsCount:    m.items.Len(),
-				MatchesCount:  len(m.matches),
-				SelectedCount: len(m.choices),
-				WindowWidth:   m.windowWidth,
-				Limit:         m.option.limit,
-				NoLimit:       m.option.noLimit,
-			}))
+		rows = append(rows, m.input.View())
+		if countViewEnabled {
+			rows = append(rows, countView)
 		}
-
 	case InputPositionBottom:
-		// count
-		if m.option.countViewEnabled {
-			_, _ = v.WriteString(m.option.countViewFunc(CountViewMeta{
-				ItemsCount:    m.items.Len(),
-				MatchesCount:  len(m.matches),
-				SelectedCount: len(m.choices),
-				WindowWidth:   m.windowWidth,
-				Limit:         m.option.limit,
-				NoLimit:       m.option.noLimit,
-			}))
-			_, _ = v.WriteRune('\n')
+		if countViewEnabled {
+			rows = append(rows, countView)
 		}
-		// input
-		_, _ = v.WriteString(m.input.View())
+		rows = append(rows, m.input.View())
 	}
 
-	return v.String()
+	return lipgloss.JoinVertical(lipgloss.Left, rows...)
 }
 
 func (m *model) inputHeight() int {
@@ -213,7 +217,7 @@ func (m *model) itemsView() string {
 		}
 	}
 
-	return strings.Join(rows, "\n")
+	return lipgloss.JoinVertical(lipgloss.Left, rows...)
 }
 
 func (m *model) itemView(match Match, cursorLine bool) string {
@@ -240,14 +244,13 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 		_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
 	}
 
-	maxItemWidth := m.windowWidth - lipgloss.Width(v.String())
+	maxItemWidth := m.mainViewWidth - lipgloss.Width(v.String())
 	if maxItemWidth < 1 {
 		return v.String()
 	}
 
 	runes := []rune(match.Str)
 	from := 0
-	to := len(runes)
 	ellipsis := ".."
 
 	// truncate string
@@ -260,24 +263,15 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 			ellipsis = ""
 		}
 
-		if len(match.MatchedIndexes) == 0 {
-			// truncate end
-			to = maxItemWidth - len(ellipsis)
-		} else {
+		if len(match.MatchedIndexes) > 0 {
 			lastMatchedIndex := match.MatchedIndexes[len(match.MatchedIndexes)-1]
 
-			if lastMatchedIndex+8+len(ellipsis) < maxItemWidth {
-				// truncate end
-				to = maxItemWidth - len(ellipsis)
-			} else {
+			if lastMatchedIndex+8+len(ellipsis) >= maxItemWidth {
 				v.WriteString(m.ellipsisStyle.Render(ellipsis))
 
 				if lastMatchedIndex+1+8+len(ellipsis) < len(runes) {
-					// truncate both start and end
 					from = lastMatchedIndex + 1 - maxItemWidth + 8 + len(ellipsis)*2
-					to = from + maxItemWidth - len(ellipsis)*2
 				} else {
-					// truncate start
 					from = len(runes) - maxItemWidth + len(ellipsis)
 				}
 			}
@@ -285,26 +279,57 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 	}
 
 	// write item
-	for ci, c := range runes[from:to] {
+	truncateSuffix := false
+	textWidth := maxItemWidth - 2
+	if from > 0 {
+		textWidth -= 2
+	}
+	var itemv strings.Builder
+	for ci, c := range runes[from:] {
+		var s string
 		// matches
 		if intContains(match.MatchedIndexes, ci+from) {
 			if cursorLine {
-				_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
+				s = m.cursorLineMatchesStyle.Render(string(c))
 			} else {
-				_, _ = v.WriteString(m.matchesStyle.Render(string(c)))
+				s = m.matchesStyle.Render(string(c))
 			}
 		} else if cursorLine {
-			_, _ = v.WriteString(m.cursorLineStyle.Render(string(c)))
+			s = m.cursorLineStyle.Render(string(c))
 		} else {
-			_, _ = v.WriteRune(c)
+			s = string(c)
 		}
+
+		if lipgloss.Width(s)+lipgloss.Width(itemv.String()) > textWidth {
+			if ci+from != len(runes) && lipgloss.Width(string(runes[ci+from:])) > 2 {
+				truncateSuffix = true
+				break
+			}
+		}
+
+		_, _ = itemv.WriteString(s)
 	}
 
-	if to != len(runes) {
-		v.WriteString(m.ellipsisStyle.Render(ellipsis))
+	if truncateSuffix {
+		_, _ = itemv.WriteString(m.ellipsisStyle.Render(ellipsis))
 	}
 
+	_, _ = v.WriteString(itemv.String())
 	return v.String()
+}
+
+func (m *model) previewWindowView() string {
+	v := ""
+	if len(m.matches) > 0 {
+		v = m.findOption.previewWindowFunc(m.matches[m.cursorPosition].Index, m.previewWindowWidth, m.windowHeight)
+	}
+
+	return lipgloss.NewStyle().
+		Width(m.previewWindowWidth).
+		Height(m.windowHeight).
+		BorderStyle(lipgloss.NormalBorder()).
+		BorderLeft(true).
+		Render(v)
 }
 
 /*
@@ -360,9 +385,9 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// window
 		m.windowWidth = msg.Width
 		m.windowHeight = msg.Height
-		m.input.Width = m.windowWidth - m.promptWidth
 		m.fixYPosition()
 		m.fixCursor()
+		m.fixWidth()
 	case watchReloadMsg:
 		// watch reload
 		return m, m.watchReload()
@@ -380,9 +405,11 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		cmds = append(cmds, cmd)
 	}
 	if beforeValue != m.input.Value() {
-		m.filter()
-		m.fixYPosition()
-		m.fixCursor()
+		if len(m.matches) > 0 || !strings.HasPrefix(m.input.Value(), beforeValue) {
+			m.filter()
+			m.fixYPosition()
+			m.fixCursor()
+		}
 	}
 
 	return m, tea.Batch(cmds...)
@@ -473,6 +500,15 @@ func (m *model) fixYPosition() {
 		m.windowYPosition = max(m.cursorPosition+1-(m.windowHeight-inputHeight), 0)
 		return
 	}
+}
+
+func (m *model) fixWidth() {
+	m.mainViewWidth = m.windowWidth
+	if m.findOption.previewWindowFunc != nil {
+		m.mainViewWidth /= 2
+		m.previewWindowWidth = m.windowWidth - m.mainViewWidth
+	}
+	m.input.Width = m.mainViewWidth - m.promptWidth - 1
 }
 
 func (m *model) forceReload() {

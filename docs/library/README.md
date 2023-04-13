@@ -158,6 +158,7 @@ if err != nil {
 - [Position of input](#position-of-input)
 - [Placeholder for input](#placeholder-for-input)
 - [Count View](#count-view)
+- [Preview Window](#preview-window)
 - [Styles](#styles)
 
 #### Prompt
@@ -252,6 +253,40 @@ if err != nil {
 ```
 
 [Example](/examples/countview/)
+
+#### Preview Window
+
+You can set a function to render a preview window by passing `fzf.PreviewWindow()` to the `Find()` method.  
+The function argument is passed the index of the item at the cursor line and the size of the preview window.
+
+```go
+files, err := os.ReadDir(".")
+if err != nil {
+  // ...
+}
+
+f, err := fzf.New()
+if err != nil {
+  // ...
+}
+
+idxs, err := f.Find(
+  files,
+  func(i int) string { return files[i].Name() },
+  fzf.WithPreviewWindow(func(i, width, height int) string {
+    info, _ := files[i].Info()
+    return fmt.Sprintf(
+      "Name: %s\nModTime: %s\nSize: %d bytes",
+      info.Name(), info.ModTime(), info.Size(),
+    )
+  }),
+)
+if err != nil {
+  // ...
+}
+```
+
+[Example](/examples/preview-window/)
 
 #### Styles
 

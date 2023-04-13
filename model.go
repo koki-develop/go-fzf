@@ -251,7 +251,6 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 
 	runes := []rune(match.Str)
 	from := 0
-	to := len(runes)
 	ellipsis := ".."
 
 	// truncate string
@@ -264,24 +263,15 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 			ellipsis = ""
 		}
 
-		if len(match.MatchedIndexes) == 0 {
-			// truncate end
-			to = maxItemWidth - len(ellipsis)
-		} else {
+		if len(match.MatchedIndexes) > 0 {
 			lastMatchedIndex := match.MatchedIndexes[len(match.MatchedIndexes)-1]
 
-			if lastMatchedIndex+8+len(ellipsis) < maxItemWidth {
-				// truncate end
-				to = maxItemWidth - len(ellipsis)
-			} else {
+			if lastMatchedIndex+8+len(ellipsis) >= maxItemWidth {
 				v.WriteString(m.ellipsisStyle.Render(ellipsis))
 
 				if lastMatchedIndex+1+8+len(ellipsis) < len(runes) {
-					// truncate both start and end
 					from = lastMatchedIndex + 1 - maxItemWidth + 8 + len(ellipsis)*2
-					to = from + maxItemWidth - len(ellipsis)*2
 				} else {
-					// truncate start
 					from = len(runes) - maxItemWidth + len(ellipsis)
 				}
 			}
@@ -289,25 +279,37 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 	}
 
 	// write item
-	for ci, c := range runes[from:to] {
+	truncateSuffix := false
+	truncateAt := maxItemWidth - 3
+	if from != 0 {
+		truncateAt -= 2
+	}
+	var itemv strings.Builder
+	for ci, c := range runes[from:] {
 		// matches
 		if intContains(match.MatchedIndexes, ci+from) {
 			if cursorLine {
-				_, _ = v.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
+				_, _ = itemv.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
 			} else {
-				_, _ = v.WriteString(m.matchesStyle.Render(string(c)))
+				_, _ = itemv.WriteString(m.matchesStyle.Render(string(c)))
 			}
 		} else if cursorLine {
-			_, _ = v.WriteString(m.cursorLineStyle.Render(string(c)))
+			_, _ = itemv.WriteString(m.cursorLineStyle.Render(string(c)))
 		} else {
-			_, _ = v.WriteRune(c)
+			_, _ = itemv.WriteRune(c)
+		}
+
+		if lipgloss.Width(itemv.String()) >= truncateAt {
+			truncateSuffix = true
+			break
 		}
 	}
 
-	if to != len(runes) {
-		v.WriteString(m.ellipsisStyle.Render(ellipsis))
+	if truncateSuffix {
+		_, _ = itemv.WriteString(m.ellipsisStyle.Render(ellipsis))
 	}
 
+	_, _ = v.WriteString(itemv.String())
 	return v.String()
 }
 

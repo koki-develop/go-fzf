@@ -8,6 +8,7 @@ import (
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
+	"github.com/mattn/go-runewidth"
 )
 
 var (
@@ -105,6 +106,8 @@ func (m *model) setFindOption(findOption *findOption) {
 }
 
 func (m *model) Init() tea.Cmd {
+	runewidth.DefaultCondition.EastAsianWidth = false
+
 	cmds := []tea.Cmd{
 		textinput.Blink,
 		tea.EnterAltScreen,

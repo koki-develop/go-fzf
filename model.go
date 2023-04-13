@@ -280,29 +280,34 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 
 	// write item
 	truncateSuffix := false
-	truncateAt := maxItemWidth - 3
-	if from != 0 {
-		truncateAt -= 2
+	textWidth := maxItemWidth - 2
+	if from > 0 {
+		textWidth -= 2
 	}
 	var itemv strings.Builder
 	for ci, c := range runes[from:] {
+		var s string
 		// matches
 		if intContains(match.MatchedIndexes, ci+from) {
 			if cursorLine {
-				_, _ = itemv.WriteString(m.cursorLineMatchesStyle.Render(string(c)))
+				s = m.cursorLineMatchesStyle.Render(string(c))
 			} else {
-				_, _ = itemv.WriteString(m.matchesStyle.Render(string(c)))
+				s = m.matchesStyle.Render(string(c))
 			}
 		} else if cursorLine {
-			_, _ = itemv.WriteString(m.cursorLineStyle.Render(string(c)))
+			s = m.cursorLineStyle.Render(string(c))
 		} else {
-			_, _ = itemv.WriteRune(c)
+			s = string(c)
 		}
 
-		if lipgloss.Width(itemv.String()) >= truncateAt {
-			truncateSuffix = true
-			break
+		if lipgloss.Width(s)+lipgloss.Width(itemv.String()) > textWidth {
+			if ci+from != len(runes) && lipgloss.Width(string(runes[ci+from:])) > 2 {
+				truncateSuffix = true
+				break
+			}
 		}
+
+		_, _ = itemv.WriteString(s)
 	}
 
 	if truncateSuffix {

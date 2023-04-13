@@ -244,48 +244,77 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 		_, _ = v.WriteString(stringLinesToSpace(m.findOption.itemPrefixFunc(match.Index)))
 	}
 
+	// truncate string
+	// TODO: refactor
 	maxItemWidth := m.mainViewWidth - lipgloss.Width(v.String())
-	if maxItemWidth < 1 {
+	from := 0
+	over := 5
+	ellipsis := ".."
+	if maxItemWidth <= lipgloss.Width(ellipsis)*2 {
+		ellipsis = "."
+	}
+	if maxItemWidth < lipgloss.Width(ellipsis)*2 {
 		return v.String()
 	}
-
+	leftDots, rightDots := false, false
+	str := match.Str
 	runes := []rune(match.Str)
-	from := 0
-	ellipsis := ".."
 
-	// truncate string
-	itemWidth := lipgloss.Width(match.Str)
-	if maxItemWidth < itemWidth {
-		if maxItemWidth <= len(ellipsis)*2 {
-			ellipsis = "."
-		}
-		if maxItemWidth <= len(ellipsis)*2 {
-			ellipsis = ""
-		}
+	// if string width exceeds maxWidth, truncate
+	if lipgloss.Width(match.Str) > maxItemWidth {
+		if len(match.MatchedIndexes) == 0 {
+			// if not filtered, truncate the right
+			rightDots = true
+			for lipgloss.Width(str)+2 > maxItemWidth {
+				runes := []rune(str)
+				str = string(runes[:len(runes)-1])
+			}
+		} else {
+			// if filtered
 
-		if len(match.MatchedIndexes) > 0 {
 			lastMatchedIndex := match.MatchedIndexes[len(match.MatchedIndexes)-1]
+			if lipgloss.Width(string(runes[:min(lastMatchedIndex+1+over, len(runes))])+ellipsis) <= maxItemWidth {
+				// if width from the beginning to index within maxWidth, truncate only the right
+				rightDots = true
+				for lipgloss.Width(str+ellipsis) > maxItemWidth {
+					runes := []rune(str)
+					str = string(runes[:len(runes)-1])
+				}
+			} else {
+				// if width from the beginning to index not within maxWidth, truncate the left
+				leftDots = true
+				if lipgloss.Width(string(runes[min(lastMatchedIndex+1+over, len(runes)-1):])) > lipgloss.Width(ellipsis) {
+					// if the right also not within, truncate
+					rightDots = true
+					for lipgloss.Width(string([]rune(str)[lastMatchedIndex+1+over:])+ellipsis) > lipgloss.Width(ellipsis) {
+						runes := []rune(str)
+						str = string(runes[:len(runes)-1])
+					}
 
-			if lastMatchedIndex+8+len(ellipsis) >= maxItemWidth {
-				v.WriteString(m.ellipsisStyle.Render(ellipsis))
-
-				if lastMatchedIndex+1+8+len(ellipsis) < len(runes) {
-					from = lastMatchedIndex + 1 - maxItemWidth + 8 + len(ellipsis)*2
+					// truncate the left
+					for lipgloss.Width(str+ellipsis+ellipsis) > maxItemWidth {
+						runes := []rune(str)
+						str = string(runes[1:])
+						from++
+					}
 				} else {
-					from = len(runes) - maxItemWidth + len(ellipsis)
+					// truncate the left
+					for lipgloss.Width(str+ellipsis) > maxItemWidth {
+						runes := []rune(str)
+						str = string(runes[1:])
+						from++
+					}
 				}
 			}
 		}
 	}
 
-	// write item
-	truncateSuffix := false
-	textWidth := maxItemWidth - 2
-	if from > 0 {
-		textWidth -= 2
+	if leftDots {
+		_, _ = v.WriteString(m.ellipsisStyle.Render(ellipsis))
 	}
-	var itemv strings.Builder
-	for ci, c := range runes[from:] {
+
+	// write item
+	for ci, c := range []rune(str) {
 		var s string
 		// matches
 		if intContains(match.MatchedIndexes, ci+from) {
@@ -300,21 +329,13 @@ func (m *model) itemView(match Match, cursorLine bool) string {
 			s = string(c)
 		}
 
-		if lipgloss.Width(s)+lipgloss.Width(itemv.String()) > textWidth {
-			if ci+from != len(runes) && lipgloss.Width(string(runes[ci+from:])) > 2 {
-				truncateSuffix = true
-				break
-			}
-		}
-
-		_, _ = itemv.WriteString(s)
+		_, _ = v.WriteString(s)
 	}
 
-	if truncateSuffix {
-		_, _ = itemv.WriteString(m.ellipsisStyle.Render(ellipsis))
+	if rightDots {
+		_, _ = v.WriteString(m.ellipsisStyle.Render(ellipsis))
 	}
 
-	_, _ = v.WriteString(itemv.String())
 	return v.String()
 }
 

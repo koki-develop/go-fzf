@@ -1,6 +1,7 @@
 package fzf
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -107,6 +108,18 @@ type option struct {
 	countViewFunc    func(meta CountViewMeta) string
 
 	hotReloadLocker sync.Locker
+}
+
+func (o *option) valid() error {
+	if o.limit < 1 {
+		return errors.New("limit must be at least 1")
+	}
+
+	if err := o.inputPosition.Valid(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (o *option) multiple() bool {

@@ -26,11 +26,7 @@ func New(opts ...Option) (*FZF, error) {
 		opt(&o)
 	}
 
-	if o.limit < 1 {
-		return nil, errors.New("limit must be at least 1")
-	}
-
-	if err := o.inputPosition.Valid(); err != nil {
+	if err := o.valid(); err != nil {
 		return nil, err
 	}
 

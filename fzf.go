@@ -3,6 +3,7 @@ package fzf
 import (
 	"errors"
 	"fmt"
+	"os"
 	"reflect"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -34,7 +35,7 @@ func New(opts ...Option) (*FZF, error) {
 
 	return &FZF{
 		model:   m,
-		program: tea.NewProgram(m),
+		program: tea.NewProgram(m, tea.WithOutput(os.Stderr)),
 	}, nil
 }
 

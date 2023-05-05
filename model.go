@@ -9,6 +9,7 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/mattn/go-runewidth"
+	"github.com/muesli/termenv"
 )
 
 var (
@@ -61,6 +62,7 @@ func newModel(opt *option) *model {
 	input.PlaceholderStyle = opt.styles.option.inputPlaceholder
 	input.TextStyle = opt.styles.option.inputText
 	input.Focus()
+	lipgloss.SetColorProfile(termenv.TrueColor)
 
 	if !opt.multiple() {
 		opt.keymap.Toggle.SetEnabled(false)

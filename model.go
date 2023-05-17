@@ -463,6 +463,8 @@ func (m *model) toggle() {
 			m.choices = append(m.choices, match.Index)
 		}
 	}
+
+	m.cursorDown()
 }
 
 func (m *model) cursorUp() {

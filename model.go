@@ -383,6 +383,8 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		case key.Matches(msg, m.option.keymap.Toggle):
 			// toggle
 			m.toggle()
+			m.fixYPosition()
+			m.fixCursor()
 		case key.Matches(msg, m.option.keymap.Up):
 			// up
 			switch m.option.inputPosition {
@@ -464,7 +466,12 @@ func (m *model) toggle() {
 		}
 	}
 
-	m.cursorDown()
+	switch m.option.inputPosition {
+	case InputPositionTop:
+		m.cursorDown()
+	case InputPositionBottom:
+		m.cursorUp()
+	}
 }
 
 func (m *model) cursorUp() {

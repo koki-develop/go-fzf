@@ -9,7 +9,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.14
 	github.com/muesli/termenv v0.15.1
 	github.com/spf13/cobra v1.7.0
-	github.com/stretchr/testify v1.8.2
+	github.com/stretchr/testify v1.8.3
 	golang.org/x/sync v0.2.0
 )
 

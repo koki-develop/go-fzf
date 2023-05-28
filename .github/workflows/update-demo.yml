@@ -21,10 +21,9 @@ jobs:
       # to install ttyd and ffmpeg
       - uses: charmbracelet/vhs-action@v1
         with:
+          version: v0.4.0 # NOTE: https://github.com/charmbracelet/vhs-action/issues/137
           path: ./tapes/cli/demo.tape
           token: ${{ secrets.GITHUB_TOKEN }}
-      - name: install vhs
-        run: go install github.com/charmbracelet/vhs@latest
 
       - name: update cli gif
         run: |

@@ -3,8 +3,8 @@ module github.com/koki-develop/go-fzf
 go 1.20
 
 require (
-	github.com/charmbracelet/bubbles v0.15.0
-	github.com/charmbracelet/bubbletea v0.24.1
+	github.com/charmbracelet/bubbles v0.16.1
+	github.com/charmbracelet/bubbletea v0.24.2
 	github.com/charmbracelet/lipgloss v0.7.1
 	github.com/mattn/go-runewidth v0.0.14
 	github.com/muesli/termenv v0.15.1

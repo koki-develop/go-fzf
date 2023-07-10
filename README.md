@@ -53,7 +53,7 @@ import (
 func main() {
 	items := []string{"hello", "world", "foo", "bar"}
 
-	f, _ := fzf.New()
+	f, err := fzf.New()
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -19,7 +19,7 @@ jobs:
           go-version-file: go.mod
 
       # to install ttyd and ffmpeg
-      - uses: charmbracelet/vhs-action@v1
+      - uses: charmbracelet/vhs-action@v2
         with:
           version: v0.4.0 # NOTE: https://github.com/charmbracelet/vhs-action/issues/137
           path: ./tapes/cli/demo.tape

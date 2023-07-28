@@ -73,9 +73,7 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 			}
 		} else {
 			fzf.model.choices = make([]int, len(findOption.preselect))
-			for i, idx := range findOption.preselect {
-				fzf.model.choices[i] = idx
-			}
+			copy(fzf.model.choices, findOption.preselect)
 		}
 	}
 

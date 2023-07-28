@@ -4,6 +4,7 @@ English | [日本語](./README.ja.md)
 
 - [Basic](#basic)
 - [Select Multiple](#select-multiple)
+- [Preselect](#preselect)
 - [Case Sensitive/Insensitive](#case-sensitiveinsensitive)
 - [Key Mapping](#key-mapping)
 - [Hot Reload](#hot-reload)
@@ -20,6 +21,12 @@ English | [日本語](./README.ja.md)
 [Example](./multiple/)
 
 ![](./multiple/demo.gif)
+
+## Preselect
+
+[Example](./preselect/)
+
+![](./preselect/demo.gif)
 
 ## Case Sensitive/Insensitive
 

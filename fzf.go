@@ -13,6 +13,7 @@ var defaultFindOption = findOption{
 	itemPrefixFunc:    nil,
 	previewWindowFunc: nil,
 	preselectAll:      false,
+	preselect:         []int{},
 }
 
 // Fuzzy Finder.
@@ -64,10 +65,17 @@ func (fzf *FZF) Find(items interface{}, itemFunc func(i int) string, opts ...Fin
 	}
 	fzf.model.loadItems(is)
 	fzf.model.setFindOption(&findOption)
-	if fzf.model.option.noLimit && findOption.preselectAll {
-		fzf.model.choices = make([]int, is.Len())
-		for i := 0; i < is.Len(); i++ {
-			fzf.model.choices[i] = i
+	if fzf.model.option.noLimit {
+		if findOption.preselectAll {
+			fzf.model.choices = make([]int, is.Len())
+			for i := 0; i < is.Len(); i++ {
+				fzf.model.choices[i] = i
+			}
+		} else {
+			fzf.model.choices = make([]int, len(findOption.preselect))
+			for i, idx := range findOption.preselect {
+				fzf.model.choices[i] = idx
+			}
 		}
 	}
 
@@ -111,6 +119,7 @@ type findOption struct {
 	itemPrefixFunc    func(i int) string
 	previewWindowFunc func(i, width, height int) string
 	preselectAll      bool
+	preselect         []int
 }
 
 // WithItemPrefix sets the prefix function of the item.
@@ -130,5 +139,12 @@ func WithPreviewWindow(f func(i, width, height int) string) FindOption {
 func WithPreselectAll(preselect bool) FindOption {
 	return func(o *findOption) {
 		o.preselectAll = preselect
+	}
+}
+
+// WithPreselect sets the preselected indexes.
+func WithPreselect(idxs []int) FindOption {
+	return func(o *findOption) {
+		o.preselect = idxs
 	}
 }

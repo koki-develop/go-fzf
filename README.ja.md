@@ -5,7 +5,6 @@
 <a href="https://github.com/koki-develop/go-fzf/releases/latest"><img src="https://img.shields.io/github/v/release/koki-develop/go-fzf?style=flat-square" alt="GitHub release (latest by date)"></a>
 <a href="https://github.com/koki-develop/go-fzf/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/koki-develop/go-fzf/ci.yml?logo=github&amp;style=flat-square" alt="GitHub Workflow Status"></a>
 <a href="https://codeclimate.com/github/koki-develop/go-fzf/maintainability"><img src="https://img.shields.io/codeclimate/maintainability/koki-develop/go-fzf?style=flat-square&amp;logo=codeclimate" alt="Maintainability"></a>
-<a href="https://goreportcard.com/report/github.com/koki-develop/go-fzf"><img src="https://goreportcard.com/badge/github.com/koki-develop/go-fzf?style=flat-square" alt="Go Report Card"></a>
 <a href="./LICENSE"><img src="https://img.shields.io/github/license/koki-develop/go-fzf?style=flat-square" alt="LICENSE"></a>
 </p>
 

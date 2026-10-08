@@ -1,6 +1,6 @@
 module github.com/koki-develop/go-fzf
 
-go 1.20
+go 1.27.2
 
 require (
 	github.com/charmbracelet/bubbles v0.16.1
